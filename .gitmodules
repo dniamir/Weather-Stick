@@ -1,3 +1,6 @@
 [submodule "lib/MAX31820"]
 	path = lib/MAX31820
 	url = https://github.com/milesburton/Arduino-Temperature-Control-Library.git
+[submodule "lib/chip_systems_cpp"]
+	path = lib/chip_systems_cpp
+	url = https://github.com/dniamir/chip_systems_cpp

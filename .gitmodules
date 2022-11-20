@@ -4,3 +4,9 @@
 [submodule "lib/chip_systems_cpp"]
 	path = lib/chip_systems_cpp
 	url = https://github.com/dniamir/chip_systems_cpp
+[submodule "lib/SCD41"]
+	path = lib/SCD41
+	url = https://github.com/Sensirion/arduino-i2c-scd4x
+[submodule "lib/Sensirion_Core"]
+	path = lib/Sensirion_Core
+	url = https://github.com/Sensirion/arduino-core

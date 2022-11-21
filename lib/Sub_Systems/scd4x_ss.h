@@ -14,8 +14,9 @@ class SCD4x_SS {
     void configure_system();
     void set_serial_number();
     String serial_to_string(uint16_t value);
-    void read_data();
+    void read_data(bool print_data);
     void check_ready_flag();
+    void print_measurements();
 
     // Measurements
     uint16_t co2 = 0;

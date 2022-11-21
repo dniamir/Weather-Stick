@@ -51,7 +51,7 @@ void SCD4x_SS::configure_system() {
     // delay(5000);
 }
 
-void SCD4x_SS::read_data() {
+void SCD4x_SS::read_data(bool print_data) {
 
     // Check that data is ready
     SCD4x_SS::check_ready_flag();
@@ -74,11 +74,14 @@ void SCD4x_SS::read_data() {
     } else if (co2_temp == 0) {
         Serial.println("Invalid sample detected, skipping.");
     } else {
-
         // Set class outputs 
         co2 = co2_temp;
         temperature = temperature_temp;
         humidity = humidity_temp;
+
+        if (!print_data) {return;}
+
+        SCD4x_SS::print_measurements();
     }
 }
 
@@ -89,5 +92,16 @@ void SCD4x_SS::check_ready_flag() {
         Serial.print("Error trying to execute readMeasurement(): ");
     }
 
+}
+
+void SCD4x_SS::print_measurements() {
+    Serial.print("Co2:");
+    Serial.print(SCD4x_SS::co2);
+    Serial.print("\t");
+    Serial.print("Temperature:");
+    Serial.print(SCD4x_SS::temperature);
+    Serial.print("\t");
+    Serial.print("Humidity:");
+    Serial.println(SCD4x_SS::humidity);
 }
 

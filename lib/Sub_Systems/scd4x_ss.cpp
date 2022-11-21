@@ -1,18 +1,14 @@
 # include <SCD4x_SS.h>
 
-SCD4x_SS::SCD4x_SS() {};
-
-SCD4x_SS::SCD4x_SS(TwoWire& i2cBus) {
-    SCD4x_SS::begin(i2cBus);    
-};
+SCD4x_SS::SCD4x_SS() : SensirionI2CScd4x() {};
 
 void SCD4x_SS::begin(TwoWire& i2cBus) {
 
     // Start I2C Measurement
-    SCD4x_SS::scd4x.begin(i2cBus);
+    SensirionI2CScd4x::begin(i2cBus);
 
     // Stop Previous Measurements if they were ongoing
-    uint16_t error = SCD4x_SS::scd4x.stopPeriodicMeasurement();
+    uint16_t error = SensirionI2CScd4x::stopPeriodicMeasurement();
     if (error) {
         Serial.print("Error trying to execute stopPeriodicMeasurement(): ");
     }
@@ -22,7 +18,7 @@ void SCD4x_SS::set_serial_number() {
     uint16_t serial0;
     uint16_t serial1;
     uint16_t serial2;
-    uint16_t error = SCD4x_SS::scd4x.getSerialNumber(serial0, serial1, serial2);
+    uint16_t error = SensirionI2CScd4x::getSerialNumber(serial0, serial1, serial2);
     if (error) {
         Serial.println("Error trying to execute getSerialNumber()");
     } else {
@@ -42,8 +38,9 @@ String SCD4x_SS::serial_to_string(uint16_t value) {
     return string1 + string2 + string3;
 }
 
-void SCD4x_SS::configure_system() {
-    uint16_t error = SCD4x_SS::scd4x.startPeriodicMeasurement();
+void SCD4x_SS::configure_system(TwoWire& i2cBus) {
+    SCD4x_SS::begin(i2cBus);
+    uint16_t error = SensirionI2CScd4x::startPeriodicMeasurement();
     if (error) {
         Serial.println("Error trying to execute startPeriodicMeasurement(): ");
     }
@@ -66,7 +63,7 @@ void SCD4x_SS::read_data(bool print_data) {
     float humidity_temp = 0.0f;
 
     // Take measurement
-    uint16_t error = SCD4x_SS::scd4x.readMeasurement(co2_temp, temperature_temp, humidity_temp);
+    uint16_t error = SensirionI2CScd4x::readMeasurement(co2_temp, temperature_temp, humidity_temp);
 
     // Error handling
     if (error) {
@@ -87,7 +84,7 @@ void SCD4x_SS::read_data(bool print_data) {
 
 void SCD4x_SS::check_ready_flag() {
 
-    uint16_t error = SCD4x_SS::scd4x.getDataReadyFlag(SCD4x_SS::ready_flag);
+    uint16_t error = SensirionI2CScd4x::getDataReadyFlag(SCD4x_SS::ready_flag);
     if (error) {
         Serial.print("Error trying to execute readMeasurement(): ");
     }

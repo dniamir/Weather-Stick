@@ -1,17 +1,13 @@
 # include <SensirionI2CScd4x.h>
 #include <Arduino.h>
-// #include <Wire.h>
 
-class SCD4x_SS {
+class SCD4x_SS : public SensirionI2CScd4x{
 
   public:
     SCD4x_SS();
-    SCD4x_SS(TwoWire& i2cBus);
-
-    SensirionI2CScd4x scd4x;
 
     void begin(TwoWire& i2cBus);
-    void configure_system();
+    void configure_system(TwoWire& i2cBus);
     void set_serial_number();
     String serial_to_string(uint16_t value);
     void read_data(bool print_data);

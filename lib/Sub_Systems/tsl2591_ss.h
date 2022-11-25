@@ -1,7 +1,7 @@
 # include <TSL2591.h>
 # include <arduino_i2c.h>
 
-class TSL2591_SS : TSL2591 {
+class TSL2591_SS : public TSL2591 {
 
   public:
     // Constructor

@@ -10,4 +10,7 @@ class MAX31820_SS : public DallasTemperature {
     // Sensor
     void read_data(bool print_data);
     void configure_system();
+
+    // Data
+    int16_t temperature_100_degc;
 };

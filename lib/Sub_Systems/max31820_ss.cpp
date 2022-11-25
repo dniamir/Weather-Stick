@@ -10,6 +10,7 @@ void MAX31820_SS::read_data(bool print_data) {
 
     DallasTemperature::requestTemperatures(); // Send the command to get temperatures
     float tempC = DallasTemperature::getTempCByIndex(0);
+    MAX31820_SS::temperature_100_degc = tempC * 100;
 
     if (!print_data) {return;}
 

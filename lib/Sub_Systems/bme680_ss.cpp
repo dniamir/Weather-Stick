@@ -28,23 +28,23 @@ void BME680_SS::configure_system(uint8_t profile_num) {
 
 void BME680_SS::read_data(bool print_data) {
 
-    int32_t temperature = BME680::read_temperature();
-    int32_t pressure = BME680::read_pressure();
-    int32_t humidity = BME680::read_humidity();
-    int32_t gas = BME680::read_gas();
-    int32_t iaq = BME680::calculate_iaq(gas, humidity / 1000);
+    BME680_SS::temperature_100 = BME680::read_temperature();
+    BME680_SS::pressure = BME680::read_pressure();
+    BME680_SS::humidity_1000 = BME680::read_humidity();
+    BME680_SS::gas = BME680::read_gas();
+    BME680_SS::iaq = BME680::calculate_iaq(gas, BME680_SS::humidity_1000 / 1000);
 
     if (!print_data) {return;}
 
     Serial.print("BME680 Temperature: ");
-    Serial.print((float)temperature / 100);
+    Serial.print((float)BME680_SS::temperature_100 / 100);
     Serial.print(", Pressure: ");
-    Serial.print((float)pressure);
+    Serial.print((float)BME680_SS::pressure);
     Serial.print(", Humidity: ");
-    Serial.print((float)humidity / 1000);
+    Serial.print((float)BME680_SS::humidity_1000 / 1000);
     Serial.print(", Raw Gas: ");
-    Serial.print((float)gas / 1000);  // Resistance should range from 0ohm (poor quality) to 50kohm (very good quality)
+    Serial.print((float)BME680_SS::gas / 1000);  // Resistance should range from 0ohm (poor quality) to 50kohm (very good quality)
     Serial.print(", IAQ: ");
-    Serial.print((float)iaq);
+    Serial.print((float)BME680_SS::iaq);
     Serial.println();
 }

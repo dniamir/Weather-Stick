@@ -1,3 +1,4 @@
+# include <Arduino.h>
 # include <eink_display_ss.h>
 # include <gui_test.h>
 
@@ -10,19 +11,6 @@ eink_display_ss::eink_display_ss() {
 void eink_display_ss::configure_system() {
 
     eink_display_ss::display.init();
-    // eink_display_ss::display.setRotation(1);
-    // eink_display_ss::display.fillScreen(GxEPD_WHITE);
-    // // eink_display_ss::display.update();
-    // eink_display_ss::display.setTextColor(GxEPD_BLACK);
-    // eink_display_ss::display.setFont(f);
-    // eink_display_ss::display.setCursor(50, 15);
-    // eink_display_ss::display.println();
-    // eink_display_ss::display.println(" Daily Quote");
-    // eink_display_ss::display.update();
-    // delay(5000);
-    // delay(1000);
-    // display.eraseDisplay();
-
 }
 
 void eink_display_ss::set_image() {
@@ -41,26 +29,26 @@ void eink_display_ss::set_image() {
     }
     while (eink_display_ss::display.nextPage());
 
-    // eink_display_ss::display.update();
     delay(2000);
-
-    // eink_display_ss::display.setRotation(1);
-    // eink_display_ss::display.setFont(f);
-    // eink_display_ss::display.setCursor(15, 10);
-    // eink_display_ss::display.println();
-    // eink_display_ss::display.println("Darien: 1");
-    // eink_display_ss::display.update();
-    // delay(5000);
-
 }
 
 void eink_display_ss::reset_screen() {
-    eink_display_ss::display.fillScreen(GxEPD_WHITE);
+
+    // eink_display_ss::display.clearScreen();
+    eink_display_ss::display.firstPage();
+    do
+    {
+        eink_display_ss::display.clearScreen();
+        eink_display_ss::display.fillScreen(GxEPD_WHITE);
+        
+    }
+    while (eink_display_ss::display.nextPage());
 }
 
 void eink_display_ss::write_text(String text, uint16_t x, uint16_t y) {
 
     eink_display_ss::display.setTextColor(GxEPD_BLACK);
+    eink_display_ss::reset_screen();
     eink_display_ss::display.firstPage();
 
     eink_display_ss::display.setRotation(3);
@@ -69,30 +57,40 @@ void eink_display_ss::write_text(String text, uint16_t x, uint16_t y) {
 
     do
     {
-        eink_display_ss::reset_screen();
         eink_display_ss::display.println(text);
         
     }
     while (eink_display_ss::display.nextPage());
 
-    // eink_display_ss::display.firstPage();
+}
 
-    // do
-    // {
+void eink_display_ss::write_readings(uint16_t *co2, 
+                                        float *temperature, 
+                                        float *humidity, 
+                                        uint16_t *light_fs,
+                                        uint16_t *light_ir,
+                                        uint16_t *light_vis,
+                                        int16_t *temperature_100_degc,
+                                        int32_t *temperature_100,
+                                        int32_t *pressure,
+                                        int32_t *humidity_1000,
+                                        int32_t *gas,
+                                        int32_t *iaq) {
 
-    // Serial.println("Test0");
-    // eink_display_ss::display.setRotation(1);
-    // Serial.println("Test1");
-    // eink_display_ss::display.setFont(f);
-    // Serial.println("Test2");
+    eink_display_ss::display.setTextColor(GxEPD_BLACK);
+    eink_display_ss::display.firstPage();
+    eink_display_ss::display.setRotation(3);
+    eink_display_ss::display.setFont(f);
+    eink_display_ss::display.setCursor(0, 20);
 
-    // eink_display_ss::display.setCursor(x, y);
-    // Serial.println("Test3");
-    // eink_display_ss::display.print(text);
-    // Serial.println("Test4");
-    // // eink_display_ss::display.update();
-    // Serial.println("Test5");
-    // }
-    // while (display.nextPage());
+    do
+    {
+        eink_display_ss::display.println("CO2: " + String(*co2) + ", T: " + String(*temperature) + ", H:" + String(*humidity));
+        eink_display_ss::display.println("FS: " + String(*light_fs) + ", IR: " + String(*light_ir) + ", VIS:" + String(*light_vis));
+        eink_display_ss::display.println("Temperature: " + String((float)*temperature_100_degc / 100));
+        eink_display_ss::display.println("T: " + String((float)*temperature_100 / 100) + ", P: " + String(*pressure) + ", H:" + String((float)*humidity_1000 / 1000));
+        eink_display_ss::display.println("G: " + String(*gas) + ", IAQ: " + String(*iaq));     
+    }
+    while (eink_display_ss::display.nextPage());
 
 }

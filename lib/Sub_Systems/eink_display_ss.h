@@ -33,4 +33,17 @@ class eink_display_ss {
     void reset_screen();
     void write_text(String text, uint16_t x, uint16_t y);
 
+    void write_readings(uint16_t *co2, 
+                      float *temperature, 
+                      float *humidity, 
+                      uint16_t *light_fs,
+                      uint16_t *light_ir,
+                      uint16_t *light_vis,
+                      int16_t *temperature_100_degc,
+                      int32_t *temperature_100,
+                      int32_t *pressure,
+                      int32_t *humidity_1000,
+                      int32_t *gas,
+                      int32_t *iaq);
+
 };

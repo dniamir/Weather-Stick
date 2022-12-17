@@ -22,6 +22,8 @@ void TSL2591_SS::configure_system() {
     TSL2591::write_tsl_field("NPIEN", 1);  // Enable No-Persist Interrupt
     
     TSL2591_SS::set_np_interrupt(0, 6000);
+
+    TSL2591::enable_interrupt();
 }
 
 void TSL2591_SS::read_data(bool print_data) {

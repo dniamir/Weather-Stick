@@ -5,6 +5,7 @@
 # include <tsl2591_ss.h>
 # include <max31820_ss.h>
 # include <bme680_ss.h>
+# include <MAX17260.h>
 # include <eink_display_ss.h>
 
 
@@ -14,6 +15,8 @@ const int tsl_interrupt_pin = 35;
 int I2C_SDA = 33;
 int I2C_SCL = 32;
 const int LED_PIN = 26;
+const int CHARGER_EN = 15;
+const int CHARGER_POK = 14;
 const float led_blink_time = 1000;
 
 // Define sensor systems
@@ -26,8 +29,9 @@ BME680_SS bme_system = BME680_SS(arduino_i2c);
 OneWire oneWire = OneWire(ONE_WIRE_BUS);
 MAX31820_SS temp_sensor = MAX31820_SS(oneWire);
 
-// Display class
+// Other Systems
 eink_display_ss display_ss = eink_display_ss();
+MAX17260 fuel_gauge = MAX17260(arduino_i2c);
 
 // Never ending task
 void toggle_led1(void * parameter){
@@ -42,7 +46,7 @@ void toggle_led1(void * parameter){
 void display_write(void * parameter){
   for(;;) { // infinite loop
   Serial.println("...Clearing Screen...");
-    display_ss.display.clearScreen();
+    // display_ss.display.clearScreen();
     Serial.println("...Resetting Screen...");
     display_ss.reset_screen();
     Serial.println("...Writing Readings...");
@@ -58,7 +62,7 @@ void display_write(void * parameter){
                             &bme_system.humidity_1000,
                             &bme_system.gas,
                             &bme_system.iaq);
-    delay(3000);
+    delay(30000);
   }
 }
 
@@ -77,11 +81,17 @@ void setup() {
   co2_system.configure_system(Wire);
   temp_sensor.configure_system();
   bme_system.configure_system();
+  fuel_gauge.configure_system();
 
   // Pin modes
   light_system.interrupt_pin = tsl_interrupt_pin;
   pinMode(tsl_interrupt_pin, INPUT);
   pinMode(LED_PIN, OUTPUT);
+  pinMode(CHARGER_EN, OUTPUT);
+  pinMode(CHARGER_POK, INPUT);
+
+  // Set Charging to Enable
+  digitalWrite(CHARGER_EN, LOW);
 
   // LED
   xTaskCreate(toggle_led1, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);
@@ -91,23 +101,46 @@ void setup() {
   // display_ss.set_image();
   xTaskCreate(display_write, "Display Write",  100000, NULL, 1, NULL);
 
-  
-
 }
 
 void loop() {
 
-  delay(1000);
+  delay(5000);
 
   // Read Data
   co2_system.read_data(true);
   light_system.read_data(true);
   temp_sensor.read_data(true);
   bme_system.read_data(true);
+  fuel_gauge.read_data(true);
 
   // // Interrupts
   Serial.print("Light Sensor Interrupt: ");
   Serial.println(light_system.read_interrupt());
   Serial.println();
+
+  // Fuel Gauge
+  // uint16_t read_val = fuel_gauge.read_field16(0x00);
+
+  // Serial.println("Fuel Gauge Debug");
+  // Serial.println(read_val);
+  // Serial.println();
+
+
+  // Serial.println(fuel_gauge.read_field16("Config"));
+  // Serial.println();
+  // fuel_gauge.write_field16("Ten", 0);
+  // Serial.println(fuel_gauge.read_field16("Config"));
+  // Serial.println(fuel_gauge.read_field16("Ten"));
+  // Serial.println();
+  // fuel_gauge.write_field16("Ten", 1);
+  // Serial.println(fuel_gauge.read_field16("Config"));
+  // Serial.println(fuel_gauge.read_field16("Ten"));
+  // Serial.println();
+
+  // Serial.println("Fuel Gauge Debug");
+  // fuel_gauge.read_data(true);
+  // Serial.println(fuel_gauge.read_field16(0x00));
+  // Serial.println();
 
 }

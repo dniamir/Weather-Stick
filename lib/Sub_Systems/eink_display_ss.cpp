@@ -35,10 +35,11 @@ void eink_display_ss::set_image() {
 void eink_display_ss::reset_screen() {
 
     // eink_display_ss::display.clearScreen();
-    eink_display_ss::display.firstPage();
+    eink_display_ss::display.firstPage
+    ();
     do
     {
-        eink_display_ss::display.clearScreen();
+        // eink_display_ss::display.clearScreen();
         eink_display_ss::display.fillScreen(GxEPD_WHITE);
         
     }
@@ -79,7 +80,7 @@ void eink_display_ss::write_readings(uint16_t *co2,
 
     eink_display_ss::display.setTextColor(GxEPD_BLACK);
     eink_display_ss::display.firstPage();
-    eink_display_ss::display.setRotation(3);
+    eink_display_ss::display.setRotation(1);
     eink_display_ss::display.setFont(f);
     eink_display_ss::display.setCursor(0, 20);
 

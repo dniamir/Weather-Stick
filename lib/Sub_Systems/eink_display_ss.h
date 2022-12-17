@@ -6,7 +6,12 @@
 
 #include <GxEPD2_BW.h> // including both doesn't use more code or ram
 // #include "epd/GxEPD2_213_B72.h"
-#include "epd/GxEPD2_290_BS.h"
+// #include "epd/GxEPD2_290_BS.h"
+// #include "epd/GxEPD2_290.h"
+// #include "epd/GxEPD2_290_I6FD.h"
+// #include "epd/GxEPD2_290_M06.h"
+// #include "epd/GxEPD2_290_T5.h"
+#include "epd/GxEPD2_213_B72.h"
 
 // E-Ink Wiring
 // Busy: D4
@@ -27,7 +32,7 @@ class eink_display_ss {
     // GxIO_Class io = GxIO_Class(SPI, 5, 22, 21);
     // GxEPD_Class display = GxEPD_Class(eink_display_ss::io, 16, 4);
 
-    GxEPD2_BW<GxEPD2_290_BS, GxEPD2_290_BS::HEIGHT> display = GxEPD2_290_BS(5, 22, 21, 4); // GxEPD2_290_BS
+    GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT> display = GxEPD2_213_B72(5, 22, 21, 4); // GxEPD2_213_B72
     void configure_system();
     void set_image();
     void reset_screen();

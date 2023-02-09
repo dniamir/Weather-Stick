@@ -49,6 +49,9 @@ class eink_display_ss {
                       int32_t *pressure,
                       int32_t *humidity_1000,
                       int32_t *gas,
-                      int32_t *iaq);
+                      int32_t *iaq,
+                      float *level_percent,
+                      float *level_mah,
+                      float *batt_voltage);
 
 };

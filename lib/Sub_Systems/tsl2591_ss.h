@@ -8,6 +8,7 @@ class TSL2591_SS : public TSL2591 {
     TSL2591_SS(ArduinoI2C input_protocol);
 
     void configure_system();
+    void disable_system();
     void read_data(bool print_data);
     void set_np_interrupt(uint16_t low_thresh, uint16_t high_thresh);
     int read_interrupt();

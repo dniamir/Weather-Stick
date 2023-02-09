@@ -26,6 +26,12 @@ void TSL2591_SS::configure_system() {
     TSL2591::enable_interrupt();
 }
 
+void TSL2591_SS::disable_system() {
+    TSL2591::disable();
+    TSL2591::write_tsl_field("AIEN", 0);  // Disable Persist Interrupt
+    TSL2591::write_tsl_field("NPIEN", 0);  // Disable No-Persist Interrupt
+}
+
 void TSL2591_SS::read_data(bool print_data) {
 
     TSL2591::read_full_luminosity();

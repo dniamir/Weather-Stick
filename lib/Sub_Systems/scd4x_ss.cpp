@@ -38,7 +38,7 @@ String SCD4x_SS::serial_to_string(uint16_t value) {
     return string1 + string2 + string3;
 }
 
-void SCD4x_SS::configure_system(TwoWire& i2cBus) {
+void SCD4x_SS::configure_periodic_mode(TwoWire& i2cBus) {
     SCD4x_SS::begin(i2cBus);
     uint16_t error = SensirionI2CScd4x::startPeriodicMeasurement();
     if (error) {
@@ -46,6 +46,34 @@ void SCD4x_SS::configure_system(TwoWire& i2cBus) {
     }
     Serial.println("Waiting for first measurement... (5 sec)");
     // delay(5000);
+}
+
+void SCD4x_SS::wake_up() {
+    uint16_t error = SensirionI2CScd4x::wakeUp();
+    if (error) {
+        Serial.println("Error trying to wake up");
+    }
+}
+
+void SCD4x_SS::power_down() {
+    uint16_t error = SensirionI2CScd4x::powerDown();
+    if (error) {
+        Serial.println("Error trying to power down");
+    }
+}
+
+void SCD4x_SS::read_oneshot() {
+    uint16_t error = SensirionI2CScd4x::measureSingleShot();
+    if (error) {
+        Serial.println("Error trying to perfom a one shot");
+    }
+}
+
+void SCD4x_SS::read_oneshot_th() {
+    uint16_t error = SensirionI2CScd4x::measureSingleShotRhtOnly();
+    if (error) {
+        Serial.println("Error trying to perform a th one shot");
+    }
 }
 
 void SCD4x_SS::read_data(bool print_data) {

@@ -9,10 +9,14 @@ class IS31FL3193_SS : public IS31FL3193 {
 
     void configure_one_shot_mode();
     void configure_pwm_mode();
-    void low_battery();
-    void charging_low_battery();
-    void charging_med_battery();
-    void charging_high_battery();
-    void charging_full_battery();
+
+    void off();                   // State 0
+    void low_battery();           // State 1
+    void charging_low_battery();  // State 2
+    void charging_med_battery();  // State 3
+    void charging_high_battery(); // State 4
+    void charging_full_battery(); // State 5
+    void air_quality_bad();       // State 6
+    void air_quality_very_bad();  // State 7
 
 };

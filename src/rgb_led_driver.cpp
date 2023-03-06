@@ -47,10 +47,12 @@ void setup() {
   Serial.println(" ");
   Serial.println("Configure RGB");
   rgb_system.configure_pwm_mode();
-  rgb_system.charging_high_battery();
+  rgb_system.charging_low_battery();
 
 }
 
 void loop() {
-
+  Serial.println("Putting system to sleep");
+  esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
+  esp_deep_sleep_start();
 }

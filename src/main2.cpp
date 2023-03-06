@@ -63,10 +63,10 @@ void toggle_led2(void * parameter) {
 // RGB LED Mode
 void rgb_led_task(void *args){
   for(;;) {
-    // if(cur_rgb_status == prev_rgb_status) {
-    //   vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //   continue;
-    // }
+    if(cur_rgb_status == prev_rgb_status) {
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      continue;
+    }
     if(cur_rgb_status == 0) {rgb_system.off();}
     else if(cur_rgb_status == 1) {rgb_system.low_battery();}
     else if(cur_rgb_status == 2) {rgb_system.charging_low_battery();}
@@ -206,20 +206,20 @@ void loop() {
   //   else {cur_rgb_status = 0;}
   // }
   
-  // // Put Microcontroller to sleep for 10 min
-  // if (!charger_ok) {
-  //   // esp_sleep_enable_timer_wakeup(60 * 0.2 * 1e6);  // us
-  //   Serial.println("Putting system to sleep");
-  //   esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
-  //   esp_sleep_enable_ext0_wakeup(GPIO_NUM_14, 0); // If charger detects an OK power source, start up system
+  // Put Microcontroller to sleep for 10 min
+  if (!charger_ok) {
+    // esp_sleep_enable_timer_wakeup(60 * 0.2 * 1e6);  // us
+    Serial.println("Putting system to sleep");
+    esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_14, 0); // If charger detects an OK power source, start up system
 
-  //   // rtc_gpio_deinit(GPIO_NUM_15);
-  //   // rtc_gpio_set_direction(GPIO_NUM_15, RTC_GPIO_MODE_OUTPUT_ONLY);
-  //   // rtc_gpio_set_level(GPIO_NUM_15, 0);
-  //   gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep modeLED_DRIVER_EN_PIN
-  //   gpio_hold_en(GPIO_NUM_17);  // Keep LED Driver enabled while in sleep mode
+    // rtc_gpio_deinit(GPIO_NUM_15);
+    // rtc_gpio_set_direction(GPIO_NUM_15, RTC_GPIO_MODE_OUTPUT_ONLY);
+    // rtc_gpio_set_level(GPIO_NUM_15, 0);
+    gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep modeLED_DRIVER_EN_PIN
+    gpio_hold_en(GPIO_NUM_17);  // Keep LED Driver enabled while in sleep mode
 
-  //   esp_deep_sleep_start();
-  // }
+    esp_deep_sleep_start();
+  }
 
 }

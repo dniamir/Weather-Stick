@@ -11,6 +11,7 @@
 
 #define ONE_WIRE_BUS 27
 const int tsl_interrupt_pin = 35;
+const int BOOT_BUTTON = 0;
 
 int I2C_SDA = 33;
 int I2C_SCL = 32;
@@ -59,6 +60,9 @@ void co2_read_task(void *arg)
 void setup() {
   Serial.begin(9600);
 
+  // Set up button
+  pinMode(BOOT_BUTTON, INPUT_PULLUP);
+
   // Setup I2C
   Wire.begin(I2C_SDA, I2C_SCL);
 
@@ -89,6 +93,10 @@ void setup() {
   xTaskCreate(co2_read_task, "CO2 Read",  4096, NULL, 2, NULL);
 
   Serial.println(" ");
+  Serial.print("Time");
+  Serial.print(", ");
+  Serial.print("Button");
+  Serial.print(", ");
   Serial.print("Gas");
   Serial.print(", ");
   Serial.print("Humidity");
@@ -130,8 +138,13 @@ void loop() {
     humidity_co2_reading = co2_system.humidity;
   }
 
+  // Read Button Press
+  bool button_press = digitalRead(BOOT_BUTTON);
+
   // Print CO2 Data
   Serial.print(time_us);
+  Serial.print(", ");
+  Serial.print(button_press);
   Serial.print(", ");
   Serial.print(gas_reading);
   Serial.print(", ");

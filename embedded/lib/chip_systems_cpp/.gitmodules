@@ -1,0 +1,6 @@
+[submodule "lib/Adafruit_GPS"]
+	path = lib/Adafruit_GPS
+	url = https://github.com/adafruit/Adafruit_GPS
+[submodule "lib/SD"]
+	path = lib/SD
+	url = https://github.com/PaulStoffregen/SD.git

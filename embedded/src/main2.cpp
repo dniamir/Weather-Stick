@@ -10,6 +10,12 @@
 # include <eink_display_ss.h>
 # include <driver/rtc_io.h>
 
+# include <WiFi.h>
+# include <HTTPClient.h>
+
+//Your IP address or domain name with URL path
+const char* server_ip_address = "192.168.4.102";
+const uint16_t server_port = 8090;
 
 #define ONE_WIRE_BUS 27
 const int tsl_interrupt_pin = 35;
@@ -21,6 +27,11 @@ const int LED_DRIVER_EN_PIN = 17;
 const int CHARGER_EN = 15;
 const int CHARGER_POK = 14;
 const float led_blink_time = 1000;
+
+// Wifi Config
+bool wifi_status = false;
+const char* ssid = "wifi_name";
+const char* password = "wifi_password";
 
 uint8_t cur_rgb_status = 0;
 uint8_t prev_rgb_status = -1;
@@ -79,8 +90,31 @@ void rgb_led_task(void *args){
   }
 }
 
+void readResponse(WiFiClient *client) {
+  unsigned long timeout = millis();
+  while(client->available() == 0){
+    if(millis() - timeout > 5000){
+      Serial.println(">>> Client Timeout !");
+      client->stop();
+      return;
+    }
+  }
+}
+
 void setup() {
   Serial.begin(9600);
+
+  // Setup Wifi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("...");
+  }
+  // Print local IP address and start web server
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 
   // Setup I2C
   Wire.begin(I2C_SDA, I2C_SCL);
@@ -205,6 +239,52 @@ void loop() {
   //   else if(co2_system.co2 > 1000) {cur_rgb_status = 6;}
   //   else {cur_rgb_status = 0;}
   // }
+
+
+  // Send data to host
+  // Serial.println("Attempting to connect to Wifi...");
+  // WiFiClient client;
+  // if (client.connect(server_ip_address, server_port)) {
+  //   client.print(bme_system.pressure);
+  //   readResponse(&client);
+  //   // client.stop();
+  //   Serial.println("Wifi send successful");
+  // }
+
+  // Send data to host
+  Serial.println("Attempting to connect to Wifi...");
+  WiFiClient client;
+  client.connect(server_ip_address, server_port);
+  client.print(" ");
+  client.print(co2_system.co2);
+  client.print(", ");
+  client.print(co2_system.temperature);
+  client.print(", ");
+  client.print(co2_system.humidity);
+  client.print(", ");
+  client.print(light_system.light_fs);
+  client.print(", ");
+  client.print(light_system.light_ir);
+  client.print(", ");
+  client.print(light_system.light_vis);
+  client.print(", ");
+  client.print(bme_system.temperature_100);
+  client.print(", ");
+  client.print(bme_system.pressure);
+  client.print(", ");
+  client.print(bme_system.humidity_1000);
+  client.print(", ");
+  client.print(bme_system.gas);
+  client.print(", ");
+  client.print(bme_system.iaq);
+  client.print(", ");
+  client.print(fuel_gauge.level_percent);
+  client.print(", ");
+  client.print(fuel_gauge.level_mah);
+  client.print(", ");
+  client.print(fuel_gauge.batt_voltage);
+  client.stop();
+
   
   // Put Microcontroller to sleep for 10 min
   if (!charger_ok) {

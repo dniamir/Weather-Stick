@@ -1,6 +1,3 @@
-[submodule "lib/MAX31820"]
-	path = lib/MAX31820
-	url = https://github.com/milesburton/Arduino-Temperature-Control-Library.git
 [submodule "lib/TSL2591"]
 	path = lib/TSL2591
 	url = https://github.com/adafruit/Adafruit_TSL2591_Library
@@ -10,12 +7,24 @@
 [submodule "lib/Adafruit_BusIO"]
 	path = lib/Adafruit_BusIO
 	url = https://github.com/adafruit/Adafruit_BusIO
-[submodule "lib/chip_systems_cpp"]
-	path = lib/chip_systems_cpp
+[submodule "embedded/lib/chip_systems_cpp"]
+	path = embedded/lib/chip_systems_cpp
 	url = https://github.com/dniamir/chip_systems_cpp
-[submodule "lib/SCD41"]
-	path = lib/SCD41
+[submodule "embedded/lib/MAX31820"]
+	path = embedded/lib/MAX31820
+	url = https://github.com/milesburton/Arduino-Temperature-Control-Library.git
+[submodule "embedded/lib/SCD41"]
+	path = embedded/lib/SCD41
 	url = https://github.com/Sensirion/arduino-i2c-scd4x
-[submodule "lib/Sensirion_Core"]
-	path = lib/Sensirion_Core
+[submodule "embedded/lib/Sensirion_Core"]
+	path = embedded/lib/Sensirion_Core
 	url = https://github.com/Sensirion/arduino-core
+[submodule "embedded/lib/TSL2591"]
+	path = embedded/lib/TSL2591
+	url = https://github.com/adafruit/Adafruit_TSL2591_Library
+[submodule "embedded/lib/GxEPD"]
+	path = embedded/lib/GxEPD
+	url = https://github.com/ZinggJM/GxEPD
+[submodule "embedded/lib/Adafruit_BusIO"]
+	path = embedded/lib/Adafruit_BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO

@@ -11,11 +11,8 @@
 # include <driver/rtc_io.h>
 
 # include <WiFi.h>
+# include <wifi_ss.h>
 # include <HTTPClient.h>
-
-//Your IP address or domain name with URL path
-const char* server_ip_address = "192.168.4.102";
-const uint16_t server_port = 8090;
 
 #define ONE_WIRE_BUS 27
 const int tsl_interrupt_pin = 35;
@@ -32,6 +29,7 @@ const float led_blink_time = 1000;
 bool wifi_status = false;
 const char* ssid = "Canucks";
 const char* password = "stanford";
+WIFI_SS wifi_system;
 
 uint8_t cur_rgb_status = 0;
 uint8_t prev_rgb_status = -1;
@@ -90,31 +88,8 @@ void rgb_led_task(void *args){
   }
 }
 
-void readResponse(WiFiClient *client) {
-  unsigned long timeout = millis();
-  while(client->available() == 0){
-    if(millis() - timeout > 5000){
-      Serial.println(">>> Client Timeout !");
-      client->stop();
-      return;
-    }
-  }
-}
-
 void setup() {
   Serial.begin(9600);
-
-  // Setup Wifi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.println("...");
-  }
-  // Print local IP address and start web server
-  Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
 
   // Setup I2C
   Wire.begin(I2C_SDA, I2C_SCL);
@@ -122,6 +97,9 @@ void setup() {
   // Soft Reset Systems
   bme_system.soft_reset();
   delay(200);
+
+  // Set up wifi
+  wifi_system.connect_to_wifi(ssid, password);
 
   // Setup systems
   light_system.configure_system();
@@ -251,43 +229,24 @@ void loop() {
   //   Serial.println("Wifi send successful");
   // }
 
-  // Send data to host
-  Serial.println("Attempting to connect to Wifi...");
-  WiFiClient client;
-  client.connect(server_ip_address, server_port);
-  client.print(" ");
-  client.print(co2_system.co2);
-  client.print(", ");
-  client.print(co2_system.temperature);
-  client.print(", ");
-  client.print(co2_system.humidity);
-  client.print(", ");
-  client.print(light_system.light_fs);
-  client.print(", ");
-  client.print(light_system.light_ir);
-  client.print(", ");
-  client.print(light_system.light_vis);
-  client.print(", ");
-  client.print(bme_system.temperature_100);
-  client.print(", ");
-  client.print(bme_system.pressure);
-  client.print(", ");
-  client.print(bme_system.humidity_1000);
-  client.print(", ");
-  client.print(bme_system.gas);
-  client.print(", ");
-  client.print(bme_system.iaq);
-  client.print(", ");
-  client.print(fuel_gauge.level_percent);
-  client.print(", ");
-  client.print(fuel_gauge.level_mah);
-  client.print(", ");
-  client.print(fuel_gauge.batt_voltage);
-  client.stop();
-
+  int32_t wifi_message[14];
+  wifi_message[0] = co2_system.co2;
+  wifi_message[1] = co2_system.temperature;
+  wifi_message[2] = co2_system.humidity;
+  wifi_message[3] = light_system.light_fs;
+  wifi_message[4] = light_system.light_ir;
+  wifi_message[5] = light_system.light_vis;
+  wifi_message[6] = bme_system.temperature_100;
+  wifi_message[7] = bme_system.pressure;
+  wifi_message[8] = bme_system.humidity_1000;
+  wifi_message[9] = bme_system.gas;
+  wifi_message[10] = bme_system.iaq;
+  wifi_message[11] = fuel_gauge.level_percent;
+  wifi_message[12] = fuel_gauge.level_mah;
+  wifi_message[13] = fuel_gauge.batt_voltage;
+  wifi_system.send_message(wifi_message);
   
   // Put Microcontroller to sleep for 10 min
-  charger_ok = true;
   if (!charger_ok) {
     // esp_sleep_enable_timer_wakeup(60 * 0.2 * 1e6);  // us
     Serial.println("Putting system to sleep");

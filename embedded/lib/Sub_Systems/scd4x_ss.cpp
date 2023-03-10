@@ -10,7 +10,7 @@ void SCD4x_SS::begin(TwoWire& i2cBus) {
     // Stop Previous Measurements if they were ongoing
     uint16_t error = SensirionI2CScd4x::stopPeriodicMeasurement();
     if (error) {
-        Serial.print("Error trying to execute stopPeriodicMeasurement(): ");
+        Serial.println("Error trying to execute stopPeriodicMeasurement(): ");
     }
 }
 
@@ -114,7 +114,7 @@ void SCD4x_SS::check_ready_flag() {
 
     uint16_t error = SensirionI2CScd4x::getDataReadyFlag(SCD4x_SS::ready_flag);
     if (error) {
-        Serial.print("Error trying to execute readMeasurement(): ");
+        Serial.println("Error trying to execute readMeasurement(): ");
     }
 
 }

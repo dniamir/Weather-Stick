@@ -80,7 +80,7 @@ void IS31FL3193_SS::air_quality_bad() {
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("yellow", 40, false);
-    IS31FL3193::set_timing(0b0000, 0b001, 0b0000, 0b001, 0b0100);
+    IS31FL3193::set_timing(0b0000, 0b000, 0b0000, 0b000, 0b1000);
 }
 
 void IS31FL3193_SS::air_quality_very_bad() {
@@ -88,7 +88,7 @@ void IS31FL3193_SS::air_quality_very_bad() {
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("purple", 40, false);
-    IS31FL3193::set_timing(0b0000, 0b001, 0b0000, 0b001, 0b0100);
+    IS31FL3193::set_timing(0b0000, 0b000, 0b0000, 0b000, 0b1000);
 }
 
 void IS31FL3193_SS::off() {

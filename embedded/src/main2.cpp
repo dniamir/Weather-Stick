@@ -12,42 +12,44 @@
 
 # include <WiFi.h>
 # include <wifi_ss.h>
-# include <HTTPClient.h>
 
-#define ONE_WIRE_BUS 27
-const int tsl_interrupt_pin = 35;
-
+// Initialize I2C
 int I2C_SDA = 33;
 int I2C_SCL = 32;
+ArduinoI2C arduino_i2c;
+
+// Initialize LEDs and LED driver
 const int LED_PIN = 26;
 const int LED_DRIVER_EN_PIN = 17;
+const float led_blink_time = 1000;
+uint8_t cur_rgb_status = 0;
+int8_t prev_rgb_status = -1;
+IS31FL3193_SS rgb_system = IS31FL3193_SS(arduino_i2c);
+
+// Initialize light sensor
+const int tsl_interrupt_pin = 35;
+TSL2591_SS light_system = TSL2591_SS(arduino_i2c);
+
+// Initialize temperature sensor
+# define ONE_WIRE_BUS 27
+OneWire oneWire = OneWire(ONE_WIRE_BUS);
+MAX31820_SS temp_sensor = MAX31820_SS(oneWire);
+
+// Initialize charger and fuel gauge
 const int CHARGER_EN = 15;
 const int CHARGER_POK = 14;
-const float led_blink_time = 1000;
+MAX17260 fuel_gauge = MAX17260(arduino_i2c);
 
-// Wifi Config
+// Initilaize Wifi
 bool wifi_status = false;
 const char* ssid = "Canucks";
 const char* password = "stanford";
 WIFI_SS wifi_system;
 
-uint8_t cur_rgb_status = 0;
-uint8_t prev_rgb_status = -1;
-
-// Define systems
-ArduinoI2C arduino_i2c;
+// Initialize other systems 
 SCD4x_SS co2_system;
-TSL2591_SS light_system = TSL2591_SS(arduino_i2c);
 BME680_SS bme_system = BME680_SS(arduino_i2c);
-IS31FL3193_SS rgb_system = IS31FL3193_SS(arduino_i2c);
-
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-OneWire oneWire = OneWire(ONE_WIRE_BUS);
-MAX31820_SS temp_sensor = MAX31820_SS(oneWire);
-
-// Other Systems
 eink_display_ss display_ss = eink_display_ss();
-MAX17260 fuel_gauge = MAX17260(arduino_i2c);
 
 // Never ending task
 void toggle_led1(void * parameter){
@@ -72,8 +74,8 @@ void toggle_led2(void * parameter) {
 // RGB LED Mode
 void rgb_led_task(void *args){
   for(;;) {
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     if(cur_rgb_status == prev_rgb_status) {
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
       continue;
     }
     if(cur_rgb_status == 0) {rgb_system.off();}
@@ -94,52 +96,50 @@ void setup() {
   // Setup I2C
   Wire.begin(I2C_SDA, I2C_SCL);
 
-  // Soft Reset Systems
+  // Gas sensor config
   bme_system.soft_reset();
+  bme_system.configure_system();
   delay(200);
 
-  // Set up wifi
-  wifi_system.connect_to_wifi(ssid, password);
-
-  // Setup systems
-  light_system.configure_system();
-  temp_sensor.configure_system();
-  bme_system.configure_system();
+  // Charger and fuel gauge config
   fuel_gauge.configure_system();
-
-  // Setup one-shot mode
-  co2_system.begin(Wire);
-
-  // Pin modes
-  light_system.interrupt_pin = tsl_interrupt_pin;
   fuel_gauge.charger_ok_pin = CHARGER_POK;
-  pinMode(tsl_interrupt_pin, INPUT);
-  pinMode(LED_PIN, OUTPUT);
-
-  // Configure charging pins
+  bool charger_ok = fuel_gauge.read_charge_source_ok();
   pinMode(CHARGER_POK, INPUT);
   pinMode(CHARGER_EN, OUTPUT);
   digitalWrite(CHARGER_EN, LOW);  // Enable charging
 
-  // Configure LED Driver Pin
-  pinMode(LED_DRIVER_EN_PIN, OUTPUT);
-  digitalWrite(LED_DRIVER_EN_PIN, HIGH);  // Enable
+  // Wifi config
+  wifi_system.connect_to_wifi(ssid, password);
 
-  // LED
-  bool charger_ok = fuel_gauge.read_charge_source_ok();
-  // if (charger_ok) {
-  //   xTaskCreate(toggle_led2, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);
-  // }
+  // Light sensor config
+  light_system.interrupt_pin = tsl_interrupt_pin;
+  light_system.configure_system();
+
+  // Temp sensor config
+  temp_sensor.configure_system();
   
-  // Display
-  display_ss.configure_system();
-  // xTaskCreate(display_write, "Display Write",  100000, NULL, 1, NULL);
+  // CO2 sensor config
+  co2_system.begin(Wire);
 
-  // Configure RGB
+  // Light sensor config
+  pinMode(tsl_interrupt_pin, INPUT);
+
+  // LEDs and LED driver config
+  pinMode(LED_PIN, OUTPUT);
   pinMode(LED_DRIVER_EN_PIN, OUTPUT);
   digitalWrite(LED_DRIVER_EN_PIN, HIGH);  // Enable
   rgb_system.configure_pwm_mode();
   rgb_system.off();
+
+  // Display config
+  display_ss.configure_system();
+  
+  // if (charger_ok) {
+  //   xTaskCreate(toggle_led2, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);
+  // }
+    
+  // xTaskCreate(display_write, "Display Write",  100000, NULL, 1, NULL);  
   // xTaskCreate(rgb_led_task, "Configure RGB",  1000, NULL, 1, NULL);
 
 }
@@ -148,7 +148,6 @@ void loop() {
 
   // Read CO2 Data - discard first entry
   co2_system.wake_up();
-  light_system.configure_system();
   co2_system.read_oneshot();
   co2_system.read_data(true);
   delay(6000);
@@ -157,6 +156,7 @@ void loop() {
   co2_system.power_down();
 
   // Take light sensor data
+  light_system.configure_system();
   light_system.read_data(true);
   light_system.disable_system();
 
@@ -193,7 +193,6 @@ void loop() {
                             &fuel_gauge.batt_voltage);  
   
   // Set LED Mode
-  Serial.println(fuel_gauge.avg_current_ma);
   bool lights_on = light_system.light_vis > 500;
   bool charging_status = (fuel_gauge.avg_current_ma > 100);
   if(lights_on) {
@@ -218,17 +217,6 @@ void loop() {
   //   else {cur_rgb_status = 0;}
   // }
 
-
-  // Send data to host
-  // Serial.println("Attempting to connect to Wifi...");
-  // WiFiClient client;
-  // if (client.connect(server_ip_address, server_port)) {
-  //   client.print(bme_system.pressure);
-  //   readResponse(&client);
-  //   // client.stop();
-  //   Serial.println("Wifi send successful");
-  // }
-
   int32_t wifi_message[14];
   wifi_message[0] = co2_system.co2;
   wifi_message[1] = co2_system.temperature;
@@ -244,18 +232,15 @@ void loop() {
   wifi_message[11] = fuel_gauge.level_percent;
   wifi_message[12] = fuel_gauge.level_mah;
   wifi_message[13] = fuel_gauge.batt_voltage;
-  wifi_system.send_message(wifi_message);
+  wifi_system.send_message(wifi_message, true);
   
   // Put Microcontroller to sleep for 10 min
   if (!charger_ok) {
-    // esp_sleep_enable_timer_wakeup(60 * 0.2 * 1e6);  // us
     Serial.println("Putting system to sleep");
     esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_14, 0); // If charger detects an OK power source, start up system
     gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep modeLED_DRIVER_EN_PIN
     gpio_hold_en(GPIO_NUM_17);  // Keep LED Driver enabled while in sleep mode
-
     esp_deep_sleep_start();
   }
-
 }

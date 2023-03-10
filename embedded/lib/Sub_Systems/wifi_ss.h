@@ -12,6 +12,6 @@ class WIFI_SS {
     bool wifi_status = false;
 
     void connect_to_wifi(const char* ssid, const char* password);
-    void send_message(int32_t message[]);
+    void send_message(int32_t message[], bool print_data=false);
 
 };

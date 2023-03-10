@@ -32,17 +32,21 @@ void WIFI_SS::connect_to_wifi(const char* ssid, const char* password) {
     Serial.println(WiFi.localIP());
 }
 
-void WIFI_SS::send_message(int32_t message[]) {
+void WIFI_SS::send_message(int32_t message[], bool print_data) {
 
     WiFiClient client;
     client.connect(WIFI_SS::server_ip_address, WIFI_SS::server_port);
-    Serial.println(WIFI_SS::server_ip_address);
-    Serial.println(WIFI_SS::server_port);
+
+    if(print_data) {
+        Serial.print("IP Address: ");
+        Serial.print(WIFI_SS::server_ip_address);
+        Serial.print(", Port: ");
+        Serial.println(WIFI_SS::server_port);
+    }
 
     for (int i=0; i<14; i++) {
         client.print(message[i]);
         client.print(", ");
-
     }
     client.stop();
 

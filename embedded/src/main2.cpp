@@ -22,8 +22,8 @@ ArduinoI2C arduino_i2c;
 const int LED_PIN = 26;
 const int LED_DRIVER_EN_PIN = 17;
 const float led_blink_time = 1000;
-uint8_t cur_rgb_status = 0;
-int8_t prev_rgb_status = -1;
+int16_t cur_rgb_status = 0;
+int16_t prev_rgb_status = -1;
 IS31FL3193_SS rgb_system = IS31FL3193_SS(arduino_i2c);
 
 // Initialize light sensor
@@ -74,7 +74,7 @@ void toggle_led2(void * parameter) {
 // RGB LED Mode
 void rgb_led_task(void *args){
   for(;;) {
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // vTaskDelay(1000.0 / portTICK_PERIOD_MS);
     if(cur_rgb_status == prev_rgb_status) {
       continue;
     }
@@ -108,9 +108,6 @@ void setup() {
   pinMode(CHARGER_POK, INPUT);
   pinMode(CHARGER_EN, OUTPUT);
   digitalWrite(CHARGER_EN, LOW);  // Enable charging
-
-  // Wifi config
-  wifi_system.connect_to_wifi(ssid, password);
 
   // Light sensor config
   light_system.interrupt_pin = tsl_interrupt_pin;
@@ -173,7 +170,6 @@ void loop() {
   // Interrupts
   Serial.print("Light Sensor Interrupt: ");
   Serial.println(light_system.read_interrupt());
-  Serial.println();
 
   // Update Screen
   display_ss.write_readings(&co2_system.co2,
@@ -216,6 +212,10 @@ void loop() {
   //   else if(co2_system.co2 > 1000) {cur_rgb_status = 6;}
   //   else {cur_rgb_status = 0;}
   // }
+  // else {cur_rgb_status = 0;}
+
+  // Wifi config
+  wifi_system.connect_to_wifi(ssid, password);  // Only connects if it's not already connected
 
   int32_t wifi_message[14];
   wifi_message[0] = co2_system.co2;
@@ -233,6 +233,8 @@ void loop() {
   wifi_message[12] = fuel_gauge.level_mah;
   wifi_message[13] = fuel_gauge.batt_voltage;
   wifi_system.send_message(wifi_message, true);
+
+  wifi_system.disconnect();
   
   // Put Microcontroller to sleep for 10 min
   if (!charger_ok) {

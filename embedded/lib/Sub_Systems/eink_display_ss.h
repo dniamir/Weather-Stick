@@ -38,20 +38,20 @@ class eink_display_ss {
     void reset_screen();
     void write_text(String text, uint16_t x, uint16_t y);
 
-    void write_readings(uint16_t *co2, 
-                      float *temperature, 
-                      float *humidity, 
-                      uint16_t *light_fs,
-                      uint16_t *light_ir,
-                      uint16_t *light_vis,
-                      int16_t *temperature_100_degc,
-                      int32_t *temperature_100,
-                      int32_t *pressure,
-                      int32_t *humidity_1000,
-                      int32_t *gas,
-                      int32_t *iaq,
-                      float *level_percent,
-                      float *level_mah,
-                      float *batt_voltage);
+    void write_readings(uint16_t *co2_ppm, 
+                        int16_t *temperature_10_degc, 
+                        int16_t *humidity_10_per, 
+                        uint16_t *light_fs,
+                        uint16_t *light_ir,
+                        uint16_t *light_vis,
+                        int16_t *temperature_100_degc,
+                        int32_t *temperature_100,
+                        int32_t *pressure,
+                        int32_t *humidity_1000,
+                        int32_t *gas,
+                        int32_t *iaq,
+                        int16_t *level_percent,
+                        int16_t *level_mah,
+                        int16_t *batt_voltage);
 
 };

@@ -65,22 +65,22 @@ void eink_display_ss::write_text(String text, uint16_t x, uint16_t y) {
 
 }
 
-void eink_display_ss::write_readings(uint16_t *co2, 
-                                        float *temperature, 
-                                        float *humidity, 
-                                        uint16_t *light_fs,
-                                        uint16_t *light_ir,
-                                        uint16_t *light_vis,
-                                        int16_t *temperature_100_degc,
-                                        int32_t *temperature_100,
-                                        int32_t *pressure,
-                                        int32_t *humidity_1000,
-                                        int32_t *gas,
-                                        int32_t *iaq,
-                                        float *level_percent,
-                                        float *level_mah,
-                                        float *batt_voltage) {
-
+void eink_display_ss::write_readings(uint16_t *co2_ppm, 
+                                     int16_t *temperature_10_degc, 
+                                     int16_t *humidity_10_per, 
+                                     uint16_t *light_fs,
+                                     uint16_t *light_ir,
+                                     uint16_t *light_vis,
+                                     int16_t *temperature_100_degc,
+                                     int32_t *temperature_100,
+                                     int32_t *pressure,
+                                     int32_t *humidity_1000,
+                                     int32_t *gas,
+                                     int32_t *iaq,
+                                     int16_t *level_10_percent,
+                                     int16_t *level_10_mah,
+                                     int16_t *batt_10_voltage) {
+ 
     eink_display_ss::display.setTextColor(GxEPD_BLACK);
     eink_display_ss::display.firstPage();
     eink_display_ss::display.setRotation(1);
@@ -89,12 +89,12 @@ void eink_display_ss::write_readings(uint16_t *co2,
 
     do
     {
-        eink_display_ss::display.println("CO2: " + String(*co2) + ", T: " + String(*temperature) + ", H:" + String(*humidity));
+        eink_display_ss::display.println("CO2: " + String(*co2_ppm) + ", T: " + String((float)*temperature_10_degc / 10) + ", H:" + String((float)*humidity_10_per / 10));
         eink_display_ss::display.println("FS: " + String(*light_fs) + ", IR: " + String(*light_ir) + ", VIS:" + String(*light_vis));
         eink_display_ss::display.println("Temperature: " + String((float)*temperature_100_degc / 100));
         eink_display_ss::display.println("T: " + String((float)*temperature_100 / 100) + ", P: " + String(*pressure) + ", H:" + String((float)*humidity_1000 / 1000));
         eink_display_ss::display.println("G: " + String(*gas) + ", IAQ: " + String(*iaq));     
-        eink_display_ss::display.println("Battery: " + String(*level_percent) + ", " + String(*level_mah) + ", " + String(*batt_voltage));  
+        eink_display_ss::display.println("Battery: " + String((float)*level_10_percent / 10) + ", " + String((float)*level_10_mah / 10) + ", " + String((float)*batt_10_voltage / 10));  
     }
     while (eink_display_ss::display.nextPage());
 

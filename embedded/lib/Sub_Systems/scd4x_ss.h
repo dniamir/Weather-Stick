@@ -21,9 +21,9 @@ class SCD4x_SS : public SensirionI2CScd4x{
     void read_oneshot_th();
 
     // Measurements
-    uint16_t co2 = 0;
-    float temperature = 0.0f;
-    float humidity = 0.0f;
+    uint16_t co2_ppm = 0;
+    int16_t temperature_10_degc = 0;
+    int16_t humidity_10_per = 0;
     bool ready_flag;
 
     String serial_number;

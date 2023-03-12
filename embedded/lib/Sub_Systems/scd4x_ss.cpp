@@ -93,6 +93,10 @@ void SCD4x_SS::read_data(bool print_data) {
     // Take measurement
     uint16_t error = SensirionI2CScd4x::readMeasurement(co2_temp, temperature_temp, humidity_temp);
 
+    // Convert floats to int
+    int16_t temperature_10_temp = temperature_temp * 10;
+    int16_t humidity_10_temp = humidity_temp * 10;
+
     // Error handling
     if (error) {
         Serial.println("Error trying to execute readMeasurement()");
@@ -100,9 +104,9 @@ void SCD4x_SS::read_data(bool print_data) {
         Serial.println("Invalid sample detected, skipping.");
     } else {
         // Set class outputs 
-        co2 = co2_temp;
-        temperature = temperature_temp;
-        humidity = humidity_temp;
+        SCD4x_SS::co2_ppm = co2_temp;
+        SCD4x_SS::temperature_10_degc = temperature_10_temp;
+        SCD4x_SS::humidity_10_per = humidity_10_temp;
 
         if (!print_data) {return;}
 
@@ -121,12 +125,12 @@ void SCD4x_SS::check_ready_flag() {
 
 void SCD4x_SS::print_measurements() {
     Serial.print("Co2:");
-    Serial.print(SCD4x_SS::co2);
+    Serial.print(SCD4x_SS::co2_ppm);
     Serial.print("\t");
     Serial.print("Temperature:");
-    Serial.print(SCD4x_SS::temperature);
+    Serial.print((float)SCD4x_SS::temperature_10_degc / 10);
     Serial.print("\t");
     Serial.print("Humidity:");
-    Serial.println(SCD4x_SS::humidity);
+    Serial.println((float)SCD4x_SS::humidity_10_per / 10);
 }
 

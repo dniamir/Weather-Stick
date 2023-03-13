@@ -13,6 +13,6 @@ class WIFI_SS {
 
     void connect_to_wifi(const char* ssid, const char* password);
     void disconnect();
-    void send_message(int32_t message[], bool print_data=false);
+    void send_message(String message[], bool print_data=false);
 
 };

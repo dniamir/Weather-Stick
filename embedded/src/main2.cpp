@@ -175,11 +175,10 @@ void loop() {
   display_ss.write_readings(&co2_system.co2_ppm,
                             &co2_system.temperature_10_degc,
                             &co2_system.humidity_10_per,
-                            &light_system.light_fs,
                             &light_system.light_ir,
                             &light_system.light_vis,
                             &temp_sensor.temperature_100_degc,
-                            &bme_system.temperature_100,
+                            &bme_system.temperature_100_degc,
                             &bme_system.pressure,
                             &bme_system.humidity_1000,
                             &bme_system.gas,
@@ -217,24 +216,28 @@ void loop() {
   // Wifi config
   wifi_system.connect_to_wifi(ssid, password);  // Only connects if it's not already connected
 
-  int32_t wifi_message[14];
-  wifi_message[0] = co2_system.co2;
-  wifi_message[1] = co2_system.temperature;
-  wifi_message[2] = co2_system.humidity;
-  wifi_message[3] = light_system.light_fs;
-  wifi_message[4] = light_system.light_ir;
-  wifi_message[5] = light_system.light_vis;
-  wifi_message[6] = bme_system.temperature_100;
-  wifi_message[7] = bme_system.pressure;
-  wifi_message[8] = bme_system.humidity_1000;
-  wifi_message[9] = bme_system.gas;
-  wifi_message[10] = bme_system.iaq;
-  wifi_message[11] = fuel_gauge.level_percent;
-  wifi_message[12] = fuel_gauge.level_mah;
-  wifi_message[13] = fuel_gauge.batt_voltage;
+  String wifi_message[16];
+  wifi_message[0] = (String)"scd_co2_ppm " + co2_system.co2_ppm;
+  wifi_message[1] = (String)"scd_temperature_10_degc " + co2_system.temperature_10_degc;
+  wifi_message[2] = (String)"scd_humidity_10_percent " + co2_system.humidity_10_per;
+  wifi_message[3] = (String)"tsl_light_fs " + light_system.light_fs;
+  wifi_message[4] = (String)"tsl_light_ir " + light_system.light_ir;
+  wifi_message[5] = (String)"tsl_light_vis " + light_system.light_vis;
+  wifi_message[6] = (String)"bme_temperature_100_degc " + bme_system.temperature_100_degc;
+  wifi_message[7] = (String)"bme_pressure_pa " + bme_system.pressure;
+  wifi_message[8] = (String)"bme_humidity_1000_percent " + bme_system.humidity_1000;
+  wifi_message[9] = (String)"bme_gas " + bme_system.gas;
+  wifi_message[10] = (String)"bme_iaq " + bme_system.iaq;
+  wifi_message[11] = (String)"max_level_10_percent " + fuel_gauge.level_10_percent;
+  wifi_message[12] = (String)"max_level_10_percent " + fuel_gauge.level_10_percent;
+  wifi_message[13] = (String)"max_batt_10_voltage " + fuel_gauge.batt_10_voltage;
+  wifi_message[14] = (String)"max_avg_current_ua " + fuel_gauge.avg_current_ua;
+  wifi_message[15] = (String)"max_temperature_100_degc " + temp_sensor.temperature_100_degc;
   wifi_system.send_message(wifi_message, true);
 
   wifi_system.disconnect();
+
+  Serial.println();
   
   // Put Microcontroller to sleep for 10 min
   if (!charger_ok) {

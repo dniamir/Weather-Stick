@@ -43,10 +43,11 @@ void WIFI_SS::disconnect() {
     WIFI_SS::status = (WiFi.status() == WL_CONNECTED);
 }
 
-void WIFI_SS::send_message(int32_t message[], bool print_data) {
+void WIFI_SS::send_message(String transmission_message[], bool print_data) {
 
     WiFiClient client;
     client.connect(WIFI_SS::server_ip_address, WIFI_SS::server_port);
+    delay(500);
 
     if(print_data) {
         Serial.print("IP Address: ");
@@ -55,13 +56,14 @@ void WIFI_SS::send_message(int32_t message[], bool print_data) {
         Serial.println(WIFI_SS::server_port);
     }
 
-    String transmission = "";
-    for (int i=0; i<14; i++) {
-        transmission += message[i];
-        transmission += ", ";
+    String transmission_values = "";
+    transmission_values += "SOT, ";
+    for (int i=0; i<16; i++) {
+        transmission_values += transmission_message[i];
+        transmission_values += ", ";
     }
-    transmission += "EOT";
-    client.print(transmission);
+    transmission_values += "EOT";
+    client.print(transmission_values);
     delay(500);
     client.stop();
     delay(500);

@@ -12,7 +12,7 @@ class BME680_SS : public BME680 {
     void read_data(bool print_data);
 
     // Saved data
-    int32_t temperature_100;
+    int32_t temperature_100_degc;
     int32_t pressure;
     int32_t humidity_1000;
     int32_t gas;

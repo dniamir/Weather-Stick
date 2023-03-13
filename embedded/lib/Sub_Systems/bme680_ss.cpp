@@ -28,7 +28,7 @@ void BME680_SS::configure_system(uint8_t profile_num) {
 
 void BME680_SS::read_data(bool print_data) {
 
-    BME680_SS::temperature_100 = BME680::read_temperature();
+    BME680_SS::temperature_100_degc = BME680::read_temperature();
     BME680_SS::pressure = BME680::read_pressure();
     BME680_SS::humidity_1000 = BME680::read_humidity();
     BME680_SS::gas = BME680::read_gas();
@@ -37,7 +37,7 @@ void BME680_SS::read_data(bool print_data) {
     if (!print_data) {return;}
 
     Serial.print("BME680 Temperature: ");
-    Serial.print((float)BME680_SS::temperature_100 / 100);
+    Serial.print((float)BME680_SS::temperature_100_degc / 100);
     Serial.print(", Pressure: ");
     Serial.print((float)BME680_SS::pressure);
     Serial.print(", Humidity: ");

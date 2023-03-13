@@ -41,7 +41,6 @@ class eink_display_ss {
     void write_readings(uint16_t *co2_ppm, 
                         int16_t *temperature_10_degc, 
                         int16_t *humidity_10_per, 
-                        uint16_t *light_fs,
                         uint16_t *light_ir,
                         uint16_t *light_vis,
                         int16_t *temperature_100_degc,

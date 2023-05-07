@@ -49,8 +49,9 @@ class eink_display_ss {
                         int32_t *humidity_1000,
                         int32_t *gas,
                         int32_t *iaq,
-                        int16_t *level_percent,
-                        int16_t *level_mah,
-                        int16_t *batt_voltage);
+                        int16_t *level_10_percent,
+                        int16_t *level_10_mah,
+                        int16_t *batt_10_voltage,
+                        bool debug);
 
 };

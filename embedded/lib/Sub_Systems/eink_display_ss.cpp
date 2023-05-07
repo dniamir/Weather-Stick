@@ -78,7 +78,26 @@ void eink_display_ss::write_readings(uint16_t *co2_ppm,
                                      int32_t *iaq,
                                      int16_t *level_10_percent,
                                      int16_t *level_10_mah,
-                                     int16_t *batt_10_voltage) {
+                                     int16_t *batt_10_voltage,
+                                     bool debug) {
+
+    if(debug) {
+        Serial.println("E-INK Write these values on screen...");
+        Serial.println(String(*co2_ppm));
+        Serial.println(String((float)*temperature_10_degc / 10));
+        Serial.println(String((float)*humidity_10_per / 10));
+        Serial.println(String(*light_ir));
+        Serial.println(String(*light_vis));
+        Serial.println(String((float)*temperature_100_degc / 100));
+        Serial.println(String((float)*temperature_100 / 100));
+        Serial.println(String(*pressure));
+        Serial.println(String((float)*humidity_1000 / 1000));
+        Serial.println(String(*iaq));
+        Serial.println(String((float)*level_10_percent / 10));
+        Serial.println(String((float)*level_10_mah / 10));
+        Serial.println(String((float)*batt_10_voltage / 10));
+        Serial.println("");
+    }
  
     eink_display_ss::display.setTextColor(GxEPD_BLACK);
     eink_display_ss::display.firstPage();

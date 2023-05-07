@@ -7,6 +7,7 @@
 # include <bme680_ss.h>
 # include <MAX17260.h>
 # include <eink_display_ss.h>
+# include <wifi.h>
 
 
 #define ONE_WIRE_BUS 27
@@ -133,9 +134,9 @@ void loop() {
     pressure_reading = bme_system.read_pressure();
 
     // Measure CO2
-    co2_reading = co2_system.co2;
-    temperature_co2_reading = co2_system.temperature;
-    humidity_co2_reading = co2_system.humidity;
+    co2_reading = co2_system.co2_ppm;
+    temperature_co2_reading = co2_system.temperature_10_degc;
+    humidity_co2_reading = co2_system.humidity_10_per;
   }
 
   // Read Button Press

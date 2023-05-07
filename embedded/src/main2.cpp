@@ -93,6 +93,11 @@ void rgb_led_task(void *args){
 void setup() {
   Serial.begin(9600);
 
+  // Toggle LED
+  Serial.println("Creating LED blink");
+  pinMode(LED_PIN, OUTPUT);
+  xTaskCreate(toggle_led1, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);
+
   // Setup I2C
   Wire.begin(I2C_SDA, I2C_SCL);
 

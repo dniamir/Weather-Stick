@@ -9,6 +9,7 @@
 # include <is31fl3193_ss.h>
 # include <eink_display_ss.h>
 # include <driver/rtc_io.h>
+# include <wifi.h>
 
 // Define systems
 ArduinoI2C arduino_i2c;
@@ -53,6 +54,6 @@ void setup() {
 
 void loop() {
   Serial.println("Putting system to sleep");
-  esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
-  esp_deep_sleep_start();
+  // esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
+  // esp_deep_sleep_start();
 }

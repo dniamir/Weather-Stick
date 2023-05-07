@@ -112,15 +112,13 @@ void setup() {
   // Light sensor config
   light_system.interrupt_pin = tsl_interrupt_pin;
   light_system.configure_system();
+  pinMode(tsl_interrupt_pin, INPUT);
 
   // Temp sensor config
   temp_sensor.configure_system();
   
   // CO2 sensor config
   co2_system.begin(Wire);
-
-  // Light sensor config
-  pinMode(tsl_interrupt_pin, INPUT);
 
   // LEDs and LED driver config
   pinMode(LED_PIN, OUTPUT);
@@ -153,7 +151,6 @@ void loop() {
   co2_system.power_down();
 
   // Take light sensor data
-  light_system.configure_system();
   light_system.read_data(true);
   light_system.disable_system();
 
@@ -185,7 +182,8 @@ void loop() {
                             &bme_system.iaq,
                             &fuel_gauge.level_10_percent,
                             &fuel_gauge.level_10_mah,
-                            &fuel_gauge.batt_10_voltage);  
+                            &fuel_gauge.batt_10_voltage,
+                            true);  
   
   // Set LED Mode
   bool lights_on = light_system.light_vis > 500;

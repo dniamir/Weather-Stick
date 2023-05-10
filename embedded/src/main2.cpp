@@ -103,8 +103,8 @@ void setup() {
 
   // Gas sensor config
   bme_system.soft_reset();
-  bme_system.configure_system();
   delay(200);
+  bme_system.configure_system();
 
   // Charger and fuel gauge config
   fuel_gauge.configure_system();
@@ -188,7 +188,7 @@ void loop() {
                             &fuel_gauge.level_10_percent,
                             &fuel_gauge.level_10_mah,
                             &fuel_gauge.batt_10_voltage,
-                            true);  
+                            false);  
   
   // Set LED Mode
   bool lights_on = light_system.light_vis > 500;
@@ -247,7 +247,7 @@ void loop() {
     Serial.println("Putting system to sleep");
     esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_14, 0); // If charger detects an OK power source, start up system
-    gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep modeLED_DRIVER_EN_PIN
+    gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep mode - LED_DRIVER_EN_PIN
     gpio_hold_en(GPIO_NUM_17);  // Keep LED Driver enabled while in sleep mode
     esp_deep_sleep_start();
   }

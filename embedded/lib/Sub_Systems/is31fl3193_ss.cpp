@@ -97,21 +97,20 @@ void IS31FL3193_SS::off() {
 }
 
 void IS31FL3193_SS::set_status(uint16_t light_vis, 
-                               int32_t avg_current_ua, 
-                               int16_t level_10_percent, 
+                               bool charger_pok,
+                               bool charger_status,
+                               int16_t level_10_percent,
                                uint16_t co2_ppm,
                                bool debug) {
 
     bool lights_on = light_vis > 500;
-    bool charging_status = (avg_current_ua > 5 * 1000);
-    charging_status = false;
     if(lights_on) {
 
-        bool status1 = (charging_status) & (level_10_percent > 950);
-        bool status2 = (charging_status) & (level_10_percent > 600);
-        bool status3 = (charging_status) & (level_10_percent > 300);
-        bool status4 = charging_status;
-        bool status5 = level_10_percent < 200;
+        bool status1 = charger_pok & ~charger_status;
+        bool status2 = charger_pok & charger_status & (level_10_percent > 60);
+        bool status3 = charger_pok & charger_status & (level_10_percent > 30);
+        bool status4 = charger_pok & charger_status;
+        bool status5 = level_10_percent < 100;
         bool status6 = co2_ppm > 1500;
         bool status7 = co2_ppm > 1000;
 

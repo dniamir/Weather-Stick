@@ -38,6 +38,7 @@ MAX31820_SS temp_sensor = MAX31820_SS(oneWire);
 // Initialize charger and fuel gauge
 const int CHARGER_EN = 15;
 const int CHARGER_POK = 14;
+const int CHARGER_STATUS = 36;
 MAX17260 fuel_gauge = MAX17260(arduino_i2c);
 
 // Initilaize Wifi
@@ -109,10 +110,12 @@ void setup() {
 
   // Charger and fuel gauge config
   fuel_gauge.configure_system();
-  fuel_gauge.charger_ok_pin = CHARGER_POK;
-  bool charger_ok = fuel_gauge.read_charge_source_ok();
+  fuel_gauge.charger_pok_pin = CHARGER_POK;
+  fuel_gauge.charger_status_pin = CHARGER_STATUS;
   pinMode(CHARGER_POK, INPUT);
   pinMode(CHARGER_EN, OUTPUT);
+  pinMode(CHARGER_STATUS, INPUT);
+  bool charger_ok = fuel_gauge.read_charger_pok();
   digitalWrite(CHARGER_EN, LOW);  // Enable charging
 
   // Light sensor config
@@ -134,13 +137,6 @@ void setup() {
 
   // Display config
   display_ss.configure_system();
-  
-  // if (charger_ok) {
-  //   xTaskCreate(toggle_led2, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);
-  // }
-    
-  // xTaskCreate(display_write, "Display Write",  100000, NULL, 1, NULL);  
-  // xTaskCreate(rgb_led_task, "Configure RGB",  1000, NULL, 1, NULL);
 
 }
 
@@ -166,8 +162,11 @@ void loop() {
 
   // Read Charger Status
   Serial.print("Charger Status is: ");
-  bool charger_ok = fuel_gauge.read_charge_source_ok();
-  Serial.println(charger_ok);
+  bool charger_pok = fuel_gauge.read_charger_pok();
+  bool charger_status = fuel_gauge.read_charger_status();
+  Serial.print(charger_status);
+  Serial.print(", Charger source is: ");
+  Serial.println(charger_pok);
 
   // Interrupts
   Serial.print("Light Sensor Interrupt: ");
@@ -192,7 +191,8 @@ void loop() {
   
   // Set LED Mode
   rgb_system.set_status(light_system.light_vis, 
-                        fuel_gauge.avg_current_ua, 
+                        charger_pok,
+                        charger_status,
                         fuel_gauge.level_10_percent, 
                         co2_system.co2_ppm,
                         true);
@@ -224,7 +224,7 @@ void loop() {
   Serial.println();
   
   // Put Microcontroller to sleep for 10 min
-  if (!charger_ok) {
+  if (!charger_pok) {
     Serial.println("Putting system to sleep");
     // esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
     gpio_deep_sleep_hold_en();

@@ -92,6 +92,7 @@ void rgb_led_task(void *args){
 
 void setup() {
   Serial.begin(9600);
+  Serial2.end();  // Needs to be called otherwise GPIO16 and GPIO17 will have conflict
 
   // Toggle LED
   Serial.println("Creating LED blink");
@@ -126,7 +127,6 @@ void setup() {
   co2_system.begin(Wire);
 
   // LEDs and LED driver config
-  pinMode(LED_PIN, OUTPUT);
   pinMode(LED_DRIVER_EN_PIN, OUTPUT);
   digitalWrite(LED_DRIVER_EN_PIN, HIGH);  // Enable
   rgb_system.configure_pwm_mode();
@@ -226,10 +226,12 @@ void loop() {
   // Put Microcontroller to sleep for 10 min
   if (!charger_ok) {
     Serial.println("Putting system to sleep");
+    // esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+    gpio_deep_sleep_hold_en();
     esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_14, 0); // If charger detects an OK power source, start up system
-    gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep mode - LED_DRIVER_EN_PIN
-    gpio_hold_en(GPIO_NUM_17);  // Keep LED Driver enabled while in sleep mode
+    gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep mode
+    gpio_hold_en(GPIO_NUM_17);  // Keep LED_DRIVER_EN_PIN high (won't work with non-RTC pin)
     esp_deep_sleep_start();
   }
 }

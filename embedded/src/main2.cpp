@@ -191,30 +191,11 @@ void loop() {
                             false);  
   
   // Set LED Mode
-  bool lights_on = light_system.light_vis > 500;
-  bool charging_status = (fuel_gauge.avg_current_ua > 100 * 1000);
-  if(lights_on) {
-    if((charging_status) & (fuel_gauge.level_10_percent > 950)) {rgb_system.charging_full_battery();}
-    else if((charging_status) & (fuel_gauge.level_10_percent > 600)) {rgb_system.charging_high_battery();}
-    else if((charging_status) & (fuel_gauge.level_10_percent > 300)) {rgb_system.charging_med_battery();}
-    else if(charging_status) {rgb_system.charging_low_battery();}
-    else if(fuel_gauge.level_10_percent < 200) {rgb_system.low_battery();}
-    else if(co2_system.co2_ppm > 1500) {rgb_system.air_quality_very_bad();}
-    else if(co2_system.co2_ppm > 1000) {rgb_system.air_quality_bad();}
-    else {rgb_system.off();}
-  }
-  else {rgb_system.off();}
-  // if(lights_on) {
-  //   if((charging_status) & (fuel_gauge.level_percent > 95)) {cur_rgb_status = 5;}
-  //   else if((charging_status) & (fuel_gauge.level_percent > 60)) {cur_rgb_status = 4;}
-  //   else if((charging_status) & (fuel_gauge.level_percent > 30)) {cur_rgb_status = 3;}
-  //   else if(charging_status) {cur_rgb_status = 2;}
-  //   else if(fuel_gauge.level_percent < 20) {cur_rgb_status = 1;}
-  //   else if(co2_system.co2 > 1500) {cur_rgb_status = 7;}
-  //   else if(co2_system.co2 > 1000) {cur_rgb_status = 6;}
-  //   else {cur_rgb_status = 0;}
-  // }
-  // else {cur_rgb_status = 0;}
+  rgb_system.set_status(light_system.light_vis, 
+                        fuel_gauge.avg_current_ua, 
+                        fuel_gauge.level_10_percent, 
+                        co2_system.co2_ppm,
+                        true);
 
   // Wifi config
   wifi_system.connect_to_wifi(ssid, password);  // Only connects if it's not already connected

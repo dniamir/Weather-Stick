@@ -95,3 +95,60 @@ void IS31FL3193_SS::off() {
 
     IS31FL3193_SS::soft_reset();
 }
+
+void IS31FL3193_SS::set_status(uint16_t light_vis, 
+                               int32_t avg_current_ua, 
+                               int16_t level_10_percent, 
+                               uint16_t co2_ppm,
+                               bool debug) {
+
+    bool lights_on = light_vis > 500;
+    bool charging_status = (avg_current_ua > 100 * 1000);
+    if(lights_on) {
+
+        bool status1 = (charging_status) & (level_10_percent > 950);
+        bool status2 = (charging_status) & (level_10_percent > 600);
+        bool status3 = (charging_status) & (level_10_percent > 300);
+        bool status4 = charging_status;
+        bool status5 = level_10_percent < 200;
+        bool status6 = co2_ppm > 1500;
+        bool status7 = co2_ppm > 1000;
+
+        if(status1) {
+            IS31FL3193_SS::charging_full_battery();
+            if(debug) {Serial.println("RGB Status 1");}
+        } 
+        else if(status2) {
+            IS31FL3193_SS::charging_high_battery();
+            if(debug) {Serial.println("RGB Status 2");}
+        }
+        else if(status3) {
+            IS31FL3193_SS::charging_med_battery();
+            if(debug) {Serial.println("RGB Status 3");}
+        }
+        else if(status4) {
+            IS31FL3193_SS::charging_low_battery();
+            if(debug) {Serial.println("RGB Status 4");}
+        }
+        else if(status5) {
+            IS31FL3193_SS::low_battery();
+            if(debug) {Serial.println("RGB Status 5");}
+        }
+        else if(status6) {
+            IS31FL3193_SS::air_quality_very_bad();
+            if(debug) {Serial.println("RGB Status 6");}
+        }
+        else if(status7) {
+            IS31FL3193_SS::air_quality_bad();
+            if(debug) {Serial.println("RGB Status 7");}
+        }
+        else {
+            IS31FL3193_SS::off();
+            if(debug) {Serial.println("RGB is OFF");}
+        }
+    }
+    else {
+        IS31FL3193_SS::off();
+        if(debug) {Serial.println("RGB is OFF");}
+    }
+}

@@ -18,5 +18,10 @@ class IS31FL3193_SS : public IS31FL3193 {
     void charging_full_battery(); // State 5
     void air_quality_bad();       // State 6
     void air_quality_very_bad();  // State 7
+    void set_status(uint16_t light_vis, 
+                    int32_t avg_current_ua, 
+                    int16_t level_10_percent, 
+                    uint16_t co2_ppm,
+                    bool debug);
 
 };

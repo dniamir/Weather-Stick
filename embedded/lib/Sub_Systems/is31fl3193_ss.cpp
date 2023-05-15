@@ -103,7 +103,8 @@ void IS31FL3193_SS::set_status(uint16_t light_vis,
                                bool debug) {
 
     bool lights_on = light_vis > 500;
-    bool charging_status = (avg_current_ua > 20 * 1000);
+    bool charging_status = (avg_current_ua > 5 * 1000);
+    charging_status = false;
     if(lights_on) {
 
         bool status1 = (charging_status) & (level_10_percent > 950);

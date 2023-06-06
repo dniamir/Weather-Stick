@@ -13,6 +13,9 @@
 # include <WiFi.h>
 # include <wifi_ss.h>
 
+// Serial version by parent ID
+String serial_id = "1632113588"; 
+
 // Initialize I2C
 int I2C_SDA = 33;
 int I2C_SCL = 32;
@@ -94,6 +97,18 @@ void rgb_led_task(void *args){
 void setup() {
   Serial.begin(9600);
   Serial2.end();  // Needs to be called otherwise GPIO16 and GPIO17 will have conflict
+
+  // Print FW Version
+  Serial.println("");
+  Serial.print("Serial Version: ");
+  Serial.println(serial_id);
+
+  // Return wakeup source - https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html#_CPPv418esp_sleep_source_t
+  esp_sleep_source_t wakeup = esp_sleep_get_wakeup_cause();
+  Serial.print("Wakeup Source was: ");
+  Serial.println(wakeup);
+  // 0 = ESP_SLEEP_WAKEUP_ALL - normal wakeup, or when EN is pressed
+  // 2 - ESP_SLEEP_WAKEUP_EXT0 - When GPIO, such as charging POK, is triggered
 
   // Toggle LED
   Serial.println("Creating LED blink");
@@ -220,12 +235,11 @@ void loop() {
   wifi_system.send_message(wifi_message, true);
 
   wifi_system.disconnect();
-
-  Serial.println();
   
   // Put Microcontroller to sleep for 10 min
   if (!charger_pok) {
     Serial.println("Putting system to sleep");
+    Serial.println("");
     // esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
     gpio_deep_sleep_hold_en();
     esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
@@ -233,5 +247,8 @@ void loop() {
     gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep mode
     gpio_hold_en(GPIO_NUM_17);  // Keep LED_DRIVER_EN_PIN high (won't work with non-RTC pin)
     esp_deep_sleep_start();
+  }
+  else {
+    Serial.println("");
   }
 }

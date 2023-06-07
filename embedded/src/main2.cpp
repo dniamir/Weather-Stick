@@ -14,7 +14,7 @@
 # include <wifi_ss.h>
 
 // Serial version by parent ID
-String serial_id = "1632113588"; 
+String serial_id = "b7f047c"; 
 
 // Initialize I2C
 int I2C_SDA = 33;
@@ -59,9 +59,9 @@ eink_display_ss display_ss = eink_display_ss();
 void toggle_led1(void * parameter){
   for(;;) { // infinite loop
     digitalWrite(LED_PIN, HIGH);  // // Turn the LED on
-    vTaskDelay(*((float*)parameter) / 2 / portTICK_PERIOD_MS);
+    vTaskDelay(*((float*)parameter) * 1 / 20 / portTICK_PERIOD_MS);
     digitalWrite(LED_PIN, LOW);  // Turn the LED off
-    vTaskDelay(*((float*)parameter) / 2 / portTICK_PERIOD_MS);
+    vTaskDelay(*((float*)parameter) * 2 / portTICK_PERIOD_MS);
   }
 }
 

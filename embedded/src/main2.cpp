@@ -14,7 +14,7 @@
 # include <wifi_ss.h>
 
 // Serial version by parent ID
-String serial_id = "b7f047c"; 
+String serial_id = "8d5f1e0"; 
 
 // Initialize I2C
 int I2C_SDA = 33;
@@ -102,6 +102,10 @@ void setup() {
   Serial.println("");
   Serial.print("Serial Version: ");
   Serial.println(serial_id);
+
+  // Print MAC Address
+  Serial.print("MAC Address: ");
+  Serial.println(WiFi.macAddress());
 
   // Return wakeup source - https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html#_CPPv418esp_sleep_source_t
   esp_sleep_source_t wakeup = esp_sleep_get_wakeup_cause();

@@ -107,8 +107,8 @@ void IS31FL3193_SS::set_status(uint16_t light_vis,
     if(lights_on) {
 
         bool status1 = charger_pok & ~charger_status;
-        bool status2 = charger_pok & charger_status & (level_10_percent > 60);
-        bool status3 = charger_pok & charger_status & (level_10_percent > 30);
+        bool status2 = charger_pok & charger_status & (level_10_percent > 600);
+        bool status3 = charger_pok & charger_status & (level_10_percent > 300);
         bool status4 = charger_pok & charger_status;
         bool status5 = level_10_percent < 100;
         bool status6 = co2_ppm > 1500;

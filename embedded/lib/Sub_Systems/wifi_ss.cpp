@@ -1,4 +1,5 @@
 # include <wifi_ss.h>
+# include <logger.h>
 
 WIFI_SS::WIFI_SS() {}
 
@@ -15,9 +16,7 @@ void WIFI_SS::connect_to_wifi(const char* ssid, const char* password) {
     uint8_t attempt = 1;
     while (!WIFI_SS::status) {
         delay(500);
-        Serial.print("Attempt ");
-        Serial.print(attempt);
-        Serial.println(" to connect to Wifi...");
+        LOGGER::write_to_log("WIFI_CONNECT", attempt);
 
         if(attempt == attempts) {break;}
 
@@ -27,12 +26,11 @@ void WIFI_SS::connect_to_wifi(const char* ssid, const char* password) {
 
     if(WIFI_SS::status) {
         // Print local IP address and start web server
-        Serial.print("WiFi connected! ");
-        Serial.print("IP address: ");
+        LOGGER::write_to_log("WIFI_DIP", (char)WiFi.localIP());
         Serial.println(WiFi.localIP());
     }
     else {
-        Serial.println("WiFi connection failed! ");
+        LOGGER::write_to_log("WIFI_CONNECT", "FAILED");
     }
     
 }
@@ -50,10 +48,8 @@ void WIFI_SS::send_message(String transmission_message[], bool print_data) {
     delay(500);
 
     if(print_data) {
-        Serial.print("IP Address: ");
-        Serial.print(WIFI_SS::server_ip_address);
-        Serial.print(", Port: ");
-        Serial.println(WIFI_SS::server_port);
+        LOGGER::write_to_log("WIFI_SIP", WIFI_SS::server_ip_address);
+        LOGGER::write_to_log("WIFI_PORT", WIFI_SS::server_port);
     }
 
     String transmission_values = "";

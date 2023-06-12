@@ -1,4 +1,5 @@
 # include <IS31FL3193_SS.h>
+# include <logger.h>
 
 IS31FL3193_SS::IS31FL3193_SS(ArduinoI2C input_protocol) : IS31FL3193(input_protocol) {}
 
@@ -19,6 +20,8 @@ void IS31FL3193_SS::configure_one_shot_mode() {
 }
 
 void IS31FL3193_SS::configure_pwm_mode() {
+
+    LOGGER::write_to_log("LED", "CONFIGURE SYSTEM");
 
     IS31FL3193::soft_reset();
     IS31FL3193::write_register("EN", 0b1); // Enable All Channels
@@ -116,39 +119,39 @@ void IS31FL3193_SS::set_status(uint16_t light_vis,
 
         if(status1) {
             IS31FL3193_SS::charging_full_battery();
-            if(debug) {Serial.println("RGB Status 1");}
+            if(debug) {LOGGER::write_to_log("RGB", "1");}
         } 
         else if(status2) {
             IS31FL3193_SS::charging_high_battery();
-            if(debug) {Serial.println("RGB Status 2");}
+            if(debug) {LOGGER::write_to_log("RGB", "2");}
         }
         else if(status3) {
             IS31FL3193_SS::charging_med_battery();
-            if(debug) {Serial.println("RGB Status 3");}
+            if(debug) {LOGGER::write_to_log("RGB", "3");}
         }
         else if(status4) {
             IS31FL3193_SS::charging_low_battery();
-            if(debug) {Serial.println("RGB Status 4");}
+            if(debug) {LOGGER::write_to_log("RGB", "4");}
         }
         else if(status5) {
             IS31FL3193_SS::low_battery();
-            if(debug) {Serial.println("RGB Status 5");}
+            if(debug) {LOGGER::write_to_log("RGB", "5");}
         }
         else if(status6) {
             IS31FL3193_SS::air_quality_very_bad();
-            if(debug) {Serial.println("RGB Status 6");}
+            if(debug) {LOGGER::write_to_log("RGB", "6");}
         }
         else if(status7) {
             IS31FL3193_SS::air_quality_bad();
-            if(debug) {Serial.println("RGB Status 7");}
+            if(debug) {LOGGER::write_to_log("RGB", "7");}
         }
         else {
             IS31FL3193_SS::off();
-            if(debug) {Serial.println("RGB is OFF");}
+            if(debug) {LOGGER::write_to_log("RGB", "0");}
         }
     }
     else {
         IS31FL3193_SS::off();
-        if(debug) {Serial.println("RGB is OFF");}
+        if(debug) {LOGGER::write_to_log("RGB", "0");}
     }
 }

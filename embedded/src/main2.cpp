@@ -9,12 +9,13 @@
 # include <is31fl3193_ss.h>
 # include <eink_display_ss.h>
 # include <driver/rtc_io.h>
+# include <logger.h>
 
 # include <WiFi.h>
 # include <wifi_ss.h>
 
 // Serial version by parent ID
-String serial_id = "8d5f1e0"; 
+std::string serial_id = "8d5f1e0fcc"; 
 
 // Initialize I2C
 int I2C_SDA = 33;
@@ -75,51 +76,28 @@ void toggle_led2(void * parameter) {
   }
 }
 
-// RGB LED Mode
-void rgb_led_task(void *args){
-  for(;;) {
-    // vTaskDelay(1000.0 / portTICK_PERIOD_MS);
-    if(cur_rgb_status == prev_rgb_status) {
-      continue;
-    }
-    if(cur_rgb_status == 0) {rgb_system.off();}
-    else if(cur_rgb_status == 1) {rgb_system.low_battery();}
-    else if(cur_rgb_status == 2) {rgb_system.charging_low_battery();}
-    else if(cur_rgb_status == 3) {rgb_system.charging_med_battery();}
-    else if(cur_rgb_status == 4) {rgb_system.charging_high_battery();}
-    else if(cur_rgb_status == 5) {rgb_system.charging_full_battery();}
-    else if(cur_rgb_status == 6) {rgb_system.air_quality_bad();}
-    else if(cur_rgb_status == 7) {rgb_system.air_quality_very_bad();}
-    prev_rgb_status = cur_rgb_status;
-  }
-}
-
 void setup() {
   Serial.begin(9600);
   Serial2.end();  // Needs to be called otherwise GPIO16 and GPIO17 will have conflict
+  Serial.println("");
 
   // Print FW Version
-  Serial.println("");
-  Serial.print("Serial Version: ");
-  Serial.println(serial_id);
-
-  // Print MAC Address
-  Serial.print("MAC Address: ");
-  Serial.println(WiFi.macAddress());
+ 
+  LOGGER::write_to_log("SRLV", serial_id);  // Print serial ID
+  LOGGER::write_to_log("MACA", (std::string)WiFi.macAddress().c_str());  // Print mac address
 
   // Return wakeup source - https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html#_CPPv418esp_sleep_source_t
-  esp_sleep_source_t wakeup = esp_sleep_get_wakeup_cause();
-  Serial.print("Wakeup Source was: ");
-  Serial.println(wakeup);
+  LOGGER::write_to_log("WAKE", (int32_t)esp_sleep_get_wakeup_cause());
   // 0 = ESP_SLEEP_WAKEUP_ALL - normal wakeup, or when EN is pressed
   // 2 - ESP_SLEEP_WAKEUP_EXT0 - When GPIO, such as charging POK, is triggered
 
   // Toggle LED
-  Serial.println("Creating LED blink");
+  LOGGER::write_to_log("LOG", "CREATE BLINK");
   pinMode(LED_PIN, OUTPUT);
   xTaskCreate(toggle_led1, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);
 
   // Setup I2C
+  LOGGER::write_to_log("LOG", "BEGIN I2C");
   Wire.begin(I2C_SDA, I2C_SCL);
 
   // Gas sensor config
@@ -134,7 +112,7 @@ void setup() {
   pinMode(CHARGER_POK, INPUT);
   pinMode(CHARGER_EN, OUTPUT);
   pinMode(CHARGER_STATUS, INPUT);
-  bool charger_ok = fuel_gauge.read_charger_pok();
+  fuel_gauge.read_charger_pok(true);
   digitalWrite(CHARGER_EN, LOW);  // Enable charging
 
   // Light sensor config
@@ -180,16 +158,11 @@ void loop() {
   fuel_gauge.read_data(true);
 
   // Read Charger Status
-  Serial.print("Charger Status is: ");
-  bool charger_pok = fuel_gauge.read_charger_pok();
-  bool charger_status = fuel_gauge.read_charger_status();
-  Serial.print(charger_status);
-  Serial.print(", Charger source is: ");
-  Serial.println(charger_pok);
+  bool charger_pok = fuel_gauge.read_charger_pok(true);
+  bool charger_status = fuel_gauge.read_charger_status(true);
 
   // Interrupts
-  Serial.print("Light Sensor Interrupt: ");
-  Serial.println(light_system.read_interrupt());
+  light_system.read_interrupt(true);
 
   // Update Screen
   display_ss.write_readings(&co2_system.co2_ppm,
@@ -242,7 +215,7 @@ void loop() {
   
   // Put Microcontroller to sleep for 10 min
   if (!charger_pok) {
-    Serial.println("Putting system to sleep");
+    LOGGER::write_to_log("LOG", "SLEEP");
     Serial.println("");
     // esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
     gpio_deep_sleep_hold_en();

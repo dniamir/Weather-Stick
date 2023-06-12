@@ -1,5 +1,6 @@
 # include <Arduino.h>
 # include <eink_display_ss.h>
+# include <logger.h>
 // # include <gui_test.h>
 
 const GFXfont* f = &FreeSansBold9pt7b;
@@ -10,6 +11,7 @@ eink_display_ss::eink_display_ss() {
 
 void eink_display_ss::configure_system() {
 
+    LOGGER::write_to_log("EINK", "CONFIGURE SYSTEM");
     eink_display_ss::display.init();
 }
 

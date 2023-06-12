@@ -1,4 +1,5 @@
 # include <BME680_SS.h>
+# include <logger.h>
 
 BME680_SS::BME680_SS(ArduinoI2C input_protocol) : BME680(input_protocol) {}
 
@@ -6,15 +7,18 @@ BME680_SS::BME680_SS(ArduinoI2C input_protocol) : BME680(input_protocol) {}
 void BME680_SS::configure_system(uint8_t profile_num) {
 
     // Read Cal codes
+    LOGGER::write_to_log("BME", "READ CAL CODES");
     BME680::read_cal_codes();
 
     // Other Sensor Settings
+    LOGGER::write_to_log("BME", "CONFIGURE HTP SENSORS");
     BME680::write_field("osrs_h", 0b101);  // 16x oversampling
     BME680::write_field("osrs_t", 0b101);  // 16x oversampling
     BME680::write_field("osrs_p", 0b101);  // 16x oversampling
     BME680::write_field("filter", 0b010);  // Filter coefficient of 3 - form of averaging filter
 
     // Gas Sensor Settings
+    LOGGER::write_to_log("BME", "CONFIGURE GAS SENSORS");
     BME680::write_field("gas_range_r", 4); // Set Gas Range
     BME680::write_field("run_gas", 0b1); // Turn on Gas Sensor
     BME680::write_field("nb_conv", profile_num); // Set Heater profile to profile 0
@@ -36,15 +40,10 @@ void BME680_SS::read_data(bool print_data) {
 
     if (!print_data) {return;}
 
-    Serial.print("BME680 Temperature: ");
-    Serial.print((float)BME680_SS::temperature_100_degc / 100);
-    Serial.print(", Pressure: ");
-    Serial.print((float)BME680_SS::pressure);
-    Serial.print(", Humidity: ");
-    Serial.print((float)BME680_SS::humidity_1000 / 1000);
-    Serial.print(", Raw Gas: ");
-    Serial.print((float)BME680_SS::gas / 1000);  // Resistance should range from 0ohm (poor quality) to 50kohm (very good quality)
-    Serial.print(", IAQ: ");
-    Serial.print((float)BME680_SS::iaq);
-    Serial.println();
+    LOGGER::write_to_log("BMET", BME680_SS::temperature_100_degc / 100);
+    LOGGER::write_to_log("BMEP", BME680_SS::pressure);
+    LOGGER::write_to_log("BMEH", BME680_SS::humidity_1000 / 1000);
+    LOGGER::write_to_log("BMEG", BME680_SS::gas / 1000);   // Resistance should range from 0ohm (poor quality) to 50kohm (very good quality)
+    LOGGER::write_to_log("BMEI", BME680_SS::iaq);
+
 }

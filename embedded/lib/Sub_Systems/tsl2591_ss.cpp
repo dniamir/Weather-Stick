@@ -1,4 +1,5 @@
 # include <TSL2591_SS.h>
+# include <logger.h>
 
 TSL2591_SS::TSL2591_SS(ArduinoI2C input_protocol) : TSL2591(input_protocol) {}
 
@@ -13,6 +14,8 @@ void TSL2591_SS::set_np_interrupt(uint16_t low_thresh, uint16_t high_thresh) {
 }
 
 void TSL2591_SS::configure_system() {
+
+    LOGGER::write_to_log("TSL", "CONFIGURE SYSTEM");
 
     TSL2591::initialize();
     TSL2591::enable();
@@ -38,18 +41,15 @@ void TSL2591_SS::read_data(bool print_data) {
 
     if (!print_data) {return;}
 
-    Serial.print("Full Scale: ");
-    Serial.print(TSL2591::light_fs);
-    Serial.print(", Infrared: ");
-    Serial.print(TSL2591::light_ir);
-    Serial.print(", Visual: ");
-    Serial.print(TSL2591::light_vis);
-    Serial.println();
+    LOGGER::write_to_log("TSLF", TSL2591::light_fs);
+    LOGGER::write_to_log("TSLI", TSL2591::light_ir);
+    LOGGER::write_to_log("TSLV", TSL2591::light_vis);
 }
 
-int TSL2591_SS::read_interrupt() {
+int TSL2591_SS::read_interrupt(bool debug) {
     bool interrupt_state = digitalRead(TSL2591_SS::interrupt_pin);
     interrupt_state = !interrupt_state;
+    if(debug) {LOGGER::write_to_log("TSL_INT", interrupt_state);}
     if (interrupt_state) {TSL2591::clear_interrupt();}
     return(interrupt_state);
 }

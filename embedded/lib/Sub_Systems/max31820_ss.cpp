@@ -1,8 +1,10 @@
 # include <MAX31820_SS.h>
+# include <logger.h>
 
 MAX31820_SS::MAX31820_SS(OneWire &oneWire) : DallasTemperature(&oneWire) {}
 
 void MAX31820_SS::configure_system() {
+    LOGGER::write_to_log("MAXT", "CONFIGURE SYSTEM");
     DallasTemperature::begin();
 }
 
@@ -14,8 +16,5 @@ void MAX31820_SS::read_data(bool print_data) {
 
     if (!print_data) {return;}
 
-    Serial.print("MAX 31820 Temperature: ");
-    Serial.print(tempC);
-    Serial.print("degC");
-    Serial.println();
+    LOGGER::write_to_log("MAXT", MAX31820_SS::temperature_100_degc / 100);
 }

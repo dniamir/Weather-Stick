@@ -1,8 +1,11 @@
 # include <SCD4x_SS.h>
+# include <logger.h>
 
 SCD4x_SS::SCD4x_SS() : SensirionI2CScd4x() {};
 
 void SCD4x_SS::begin(TwoWire& i2cBus) {
+
+    LOGGER::write_to_log("SCD", "CONFIGURE SYSTEM");
 
     // Start I2C Measurement
     SensirionI2CScd4x::begin(i2cBus);
@@ -10,7 +13,7 @@ void SCD4x_SS::begin(TwoWire& i2cBus) {
     // Stop Previous Measurements if they were ongoing
     uint16_t error = SensirionI2CScd4x::stopPeriodicMeasurement();
     if (error) {
-        Serial.println("Error trying to execute stopPeriodicMeasurement(): ");
+        LOGGER::write_to_log("SCD", "STOP PERIODIC FAILED");
     }
 }
 
@@ -20,7 +23,7 @@ void SCD4x_SS::set_serial_number() {
     uint16_t serial2;
     uint16_t error = SensirionI2CScd4x::getSerialNumber(serial0, serial1, serial2);
     if (error) {
-        Serial.println("Error trying to execute getSerialNumber()");
+        LOGGER::write_to_log("SCD", "SRN RETRIEVAL FAILED");
     } else {
         Serial.print("Serial: 0x");
         String string1 = SCD4x_SS::serial_to_string(serial0);
@@ -42,37 +45,37 @@ void SCD4x_SS::configure_periodic_mode(TwoWire& i2cBus) {
     SCD4x_SS::begin(i2cBus);
     uint16_t error = SensirionI2CScd4x::startPeriodicMeasurement();
     if (error) {
-        Serial.println("Error trying to execute startPeriodicMeasurement(): ");
+        LOGGER::write_to_log("SCD", "STOP PERIODIC FAILED");
     }
-    Serial.println("Waiting for first measurement... (5 sec)");
+    LOGGER::write_to_log("SCD", "WAITING FOR PERIODIC MEASUREMENT...");
     // delay(5000);
 }
 
 void SCD4x_SS::wake_up() {
     uint16_t error = SensirionI2CScd4x::wakeUp();
     if (error) {
-        Serial.println("Error trying to wake up");
+        LOGGER::write_to_log("SCD", "WAKE FAILED");
     }
 }
 
 void SCD4x_SS::power_down() {
     uint16_t error = SensirionI2CScd4x::powerDown();
     if (error) {
-        Serial.println("Error trying to power down");
+        LOGGER::write_to_log("SCD", "POWER DOWN FAILED");
     }
 }
 
 void SCD4x_SS::read_oneshot() {
     uint16_t error = SensirionI2CScd4x::measureSingleShot();
     if (error) {
-        Serial.println("Error trying to perfom a one shot");
+        LOGGER::write_to_log("SCD", "ONE SHOT FAILED");
     }
 }
 
 void SCD4x_SS::read_oneshot_th() {
     uint16_t error = SensirionI2CScd4x::measureSingleShotRhtOnly();
     if (error) {
-        Serial.println("Error trying to perform a th one shot");
+        LOGGER::write_to_log("SCD", "ONE SHOT FAILED");
     }
 }
 
@@ -99,9 +102,9 @@ void SCD4x_SS::read_data(bool print_data) {
 
     // Error handling
     if (error) {
-        Serial.println("Error trying to execute readMeasurement()");
+        LOGGER::write_to_log("SCD", "READ MEASUREMENT FAILED");
     } else if (co2_temp == 0) {
-        Serial.println("Invalid sample detected, skipping.");
+        LOGGER::write_to_log("SCD", "SAMPLE SKIPPED");
     } else {
         // Set class outputs 
         SCD4x_SS::co2_ppm = co2_temp;
@@ -118,19 +121,13 @@ void SCD4x_SS::check_ready_flag() {
 
     uint16_t error = SensirionI2CScd4x::getDataReadyFlag(SCD4x_SS::ready_flag);
     if (error) {
-        Serial.println("Error trying to execute readMeasurement(): ");
+        LOGGER::write_to_log("SCD", "READ MEASUREMENT FAILED");
     }
-
 }
 
 void SCD4x_SS::print_measurements() {
-    Serial.print("Co2:");
-    Serial.print(SCD4x_SS::co2_ppm);
-    Serial.print("\t");
-    Serial.print("Temperature:");
-    Serial.print((float)SCD4x_SS::temperature_10_degc / 10);
-    Serial.print("\t");
-    Serial.print("Humidity:");
-    Serial.println((float)SCD4x_SS::humidity_10_per / 10);
+    LOGGER::write_to_log("SCDC", SCD4x_SS::co2_ppm);
+    LOGGER::write_to_log("SCDT", SCD4x_SS::temperature_10_degc / 10);
+    LOGGER::write_to_log("SCDH", SCD4x_SS::humidity_10_per / 10);
 }
 

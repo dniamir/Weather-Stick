@@ -15,7 +15,7 @@
 # include <wifi_ss.h>
 
 // Serial version by parent ID
-std::string serial_id = "8d5f1e0fcc"; 
+std::string serial_id = "713e4878a4"; 
 
 // Initialize I2C
 int I2C_SDA = 33;

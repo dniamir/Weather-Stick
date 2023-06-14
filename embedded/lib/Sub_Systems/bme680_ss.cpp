@@ -40,10 +40,10 @@ void BME680_SS::read_data(bool print_data) {
 
     if (!print_data) {return;}
 
-    LOGGER::write_to_log("BMET", BME680_SS::temperature_100_degc / 100);
+    LOGGER::write_to_log("BMET", BME680_SS::temperature_100_degc, 2);
     LOGGER::write_to_log("BMEP", BME680_SS::pressure);
-    LOGGER::write_to_log("BMEH", BME680_SS::humidity_1000 / 1000);
-    LOGGER::write_to_log("BMEG", BME680_SS::gas / 1000);   // Resistance should range from 0ohm (poor quality) to 50kohm (very good quality)
+    LOGGER::write_to_log("BMEH", BME680_SS::humidity_1000, 3);
+    LOGGER::write_to_log("BMEG", BME680_SS::gas, 3);   // Resistance should range from 0ohm (poor quality) to 50kohm (very good quality)
     LOGGER::write_to_log("BMEI", BME680_SS::iaq);
 
 }

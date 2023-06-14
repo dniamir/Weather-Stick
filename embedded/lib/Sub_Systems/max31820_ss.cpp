@@ -16,5 +16,5 @@ void MAX31820_SS::read_data(bool print_data) {
 
     if (!print_data) {return;}
 
-    LOGGER::write_to_log("MAXT", MAX31820_SS::temperature_100_degc / 100);
+    LOGGER::write_to_log("MAXT", MAX31820_SS::temperature_100_degc, 2);
 }

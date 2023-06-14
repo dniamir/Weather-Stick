@@ -83,6 +83,8 @@ void eink_display_ss::write_readings(uint16_t *co2_ppm,
                                      int16_t *batt_10_voltage,
                                      bool debug) {
 
+    LOGGER::write_to_log("EINK", "WRITE TO SCREEN");
+    
     if(debug) {
         Serial.println("E-INK Write these values on screen...");
         Serial.println(String(*co2_ppm));

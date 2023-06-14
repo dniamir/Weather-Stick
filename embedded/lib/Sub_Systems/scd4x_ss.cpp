@@ -127,7 +127,7 @@ void SCD4x_SS::check_ready_flag() {
 
 void SCD4x_SS::print_measurements() {
     LOGGER::write_to_log("SCDC", SCD4x_SS::co2_ppm);
-    LOGGER::write_to_log("SCDT", SCD4x_SS::temperature_10_degc / 10);
-    LOGGER::write_to_log("SCDH", SCD4x_SS::humidity_10_per / 10);
+    LOGGER::write_to_log("SCDT", SCD4x_SS::temperature_10_degc, 1);
+    LOGGER::write_to_log("SCDH", SCD4x_SS::humidity_10_per, 1);
 }
 

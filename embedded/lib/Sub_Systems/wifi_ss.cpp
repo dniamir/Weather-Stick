@@ -27,7 +27,6 @@ void WIFI_SS::connect_to_wifi(const char* ssid, const char* password) {
     if(WIFI_SS::status) {
         // Print local IP address and start web server
         LOGGER::write_to_log("WIFI_DIP", (char)WiFi.localIP());
-        Serial.println(WiFi.localIP());
     }
     else {
         LOGGER::write_to_log("WIFI_CONNECT", "FAILED");

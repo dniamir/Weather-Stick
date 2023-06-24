@@ -1,7 +1,9 @@
 # include <IS31FL3193_SS.h>
 # include <logger.h>
 
-IS31FL3193_SS::IS31FL3193_SS(ArduinoI2C input_protocol) : IS31FL3193(input_protocol) {}
+IS31FL3193_SS::IS31FL3193_SS(ArduinoI2C input_protocol) : IS31FL3193(input_protocol) {
+    IS31FL3193_SS::status = -1;
+}
 
 void IS31FL3193_SS::configure_one_shot_mode() {
 
@@ -40,81 +42,99 @@ void IS31FL3193_SS::configure_pwm_mode() {
     IS31FL3193::write_register("LED Control", 0b111); // Set current limits on all LEDs
 }
 
+void IS31FL3193_SS::off() {
+
+    if(IS31FL3193_SS::status == 0) {return;}
+    LOGGER::write_to_log("RGB", "OFF");
+    IS31FL3193_SS::soft_reset();
+    IS31FL3193_SS::status = 0;
+}
+
 void IS31FL3193_SS::low_battery() {
 
+    if(IS31FL3193_SS::status == 5) {return;}
     LOGGER::write_to_log("RGB", "LOW BATTERY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("red", 5, false);
     IS31FL3193::set_timing(0b0000, 0b000, 0b0000, 0b000, 0b0100);
+    IS31FL3193_SS::status = 5;
 }
 
 void IS31FL3193_SS::charging_low_battery() {
 
+    if(IS31FL3193_SS::status == 4) {return;}
     LOGGER::write_to_log("RGB", "CHARGING LOW BATTERY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("green", 100, false);
     IS31FL3193::set_timing(0b0000, 0b001, 0b0000, 0b001, 0b0000);
+    IS31FL3193_SS::status = 4;
 }
 
 void IS31FL3193_SS::charging_med_battery() {
 
+    if(IS31FL3193_SS::status == 3) {return;}
     LOGGER::write_to_log("RGB", "CHARGING MED BATTERY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("green", 100, false);
     IS31FL3193::set_timing(0b0000, 0b001, 0b0001, 0b001, 0b0010);
+    IS31FL3193_SS::status = 3;
 }
 
 void IS31FL3193_SS::charging_high_battery() {
 
+    if(IS31FL3193_SS::status == 2) {return;}
     LOGGER::write_to_log("RGB", "CHARGING HIGH BATTERY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("green", 100, false);
     IS31FL3193::set_timing(0b0000, 0b010, 0b0100, 0b010, 0b0001);
+    IS31FL3193_SS::status = 2;
 }
 
 void IS31FL3193_SS::charging_full_battery() {
 
+    if(IS31FL3193_SS::status == 1) {return;}
     LOGGER::write_to_log("RGB", "CHARGING FULL BATTERY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("green", 40, false);
     IS31FL3193::set_timing(0b0000, 0b0000, 0b0100, 0b0000, 0b0000);
+    IS31FL3193_SS::status = 1;
 }
 
 void IS31FL3193_SS::air_quality_bad() {
+
+    if(IS31FL3193_SS::status == 7) {return;}
 
     LOGGER::write_to_log("RGB", "BAD AIR QUALITY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("yellow", 40, false);
     IS31FL3193::set_timing(0b0000, 0b000, 0b0000, 0b000, 0b1000);
+    IS31FL3193_SS::status = 7;
 }
 
 void IS31FL3193_SS::air_quality_very_bad() {
 
+    if(IS31FL3193_SS::status == 6) {return;}
     LOGGER::write_to_log("RGB", "VERY BAD AIR QUALITY");
     IS31FL3193_SS::configure_pwm_mode();
     IS31FL3193::set_color("white", 0, false);
     IS31FL3193::set_color("purple", 40, false);
     IS31FL3193::set_timing(0b0000, 0b000, 0b0000, 0b000, 0b1000);
+    IS31FL3193_SS::status = 6;
 }
 
-void IS31FL3193_SS::off() {
 
-    LOGGER::write_to_log("RGB", "OFF");
-    IS31FL3193_SS::soft_reset();
-}
 
 void IS31FL3193_SS::set_status(uint16_t light_vis, 
                                bool charger_pok,
                                bool charger_status,
                                int16_t level_10_percent,
-                               uint16_t co2_ppm,
-                               bool debug) {
+                               uint16_t co2_ppm) {
 
     bool lights_on = light_vis > 500;
     if(lights_on) {
@@ -149,7 +169,7 @@ void IS31FL3193_SS::set_status(uint16_t light_vis,
             IS31FL3193_SS::air_quality_bad();
         }
         else {
-            IS31FL3193_SS::off();
+            IS31FL3193_SS::off();  // Status 0
         }
     }
     else {

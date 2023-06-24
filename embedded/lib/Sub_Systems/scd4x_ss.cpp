@@ -1,7 +1,12 @@
 # include <SCD4x_SS.h>
 # include <logger.h>
 
-SCD4x_SS::SCD4x_SS() : SensirionI2CScd4x() {};
+SCD4x_SS::SCD4x_SS() : SensirionI2CScd4x() {
+    SCD4x_SS::co2_ppm = 0;
+    SCD4x_SS::temperature_10_degc = 0;
+    SCD4x_SS::humidity_10_per = 0;
+    SCD4x_SS::ready_flag;
+};
 
 void SCD4x_SS::begin(TwoWire& i2cBus) {
 

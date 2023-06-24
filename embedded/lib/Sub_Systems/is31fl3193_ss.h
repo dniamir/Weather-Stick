@@ -4,6 +4,8 @@
 class IS31FL3193_SS : public IS31FL3193 {
 
   public:
+    int8_t status;
+
     // Constructor
     IS31FL3193_SS(ArduinoI2C input_protocol);
 
@@ -22,7 +24,6 @@ class IS31FL3193_SS : public IS31FL3193 {
                     bool charger_pok,
                     bool charger_status,
                     int16_t level_10_percent,
-                    uint16_t co2_ppm,
-                    bool debug);
+                    uint16_t co2_ppm);
 
 };

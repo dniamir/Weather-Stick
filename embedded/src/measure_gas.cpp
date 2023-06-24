@@ -17,8 +17,8 @@ const int BOOT_BUTTON = 0;
 int I2C_SDA = 33;
 int I2C_SCL = 32;
 const int LED_PIN = 26;
-const int CHARGER_EN = 15;
-const int CHARGER_POK = 14;
+const int CHARGER_EN_PIN = 15;
+const int CHARGER_POK_PIN = 14;
 const float led_blink_time = 1000;
 int counter = 0;
 
@@ -80,11 +80,11 @@ void setup() {
   // Pin modes
   pinMode(tsl_interrupt_pin, INPUT);
   pinMode(LED_PIN, OUTPUT);
-  pinMode(CHARGER_EN, OUTPUT);
-  pinMode(CHARGER_POK, INPUT);
+  pinMode(CHARGER_EN_PIN, OUTPUT);
+  pinMode(CHARGER_POK_PIN, INPUT);
 
   // Set Charging to Enable
-  digitalWrite(CHARGER_EN, LOW);
+  digitalWrite(CHARGER_EN_PIN, LOW);
 
   // LED
   xTaskCreate(toggle_led1, "Toggle LED1",  1000, (void*)&led_blink_time, 1, NULL);

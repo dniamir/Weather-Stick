@@ -15,7 +15,7 @@
 # include <wifi_ss.h>
 
 // Serial version by parent ID
-std::string serial_id = "713e4878a4"; 
+std::string serial_id = "ffc010e6fd"; 
 
 // Initialize I2C
 int I2C_SDA = 33;
@@ -40,9 +40,9 @@ OneWire oneWire = OneWire(ONE_WIRE_BUS);
 MAX31820_SS temp_sensor = MAX31820_SS(oneWire);
 
 // Initialize charger and fuel gauge
-const int CHARGER_EN = 15;
-const int CHARGER_POK = 14;
-const int CHARGER_STATUS = 36;
+const int CHARGER_EN_PIN = 15;
+const int CHARGER_POK_PIN = 14;
+const int CHARGER_STATUS_PIN = 36;
 MAX17260 fuel_gauge = MAX17260(arduino_i2c);
 
 // Initilaize Wifi
@@ -66,13 +66,30 @@ void toggle_led1(void * parameter){
   }
 }
 
-// Almost never ending task
-void toggle_led2(void * parameter) {
-  for(uint8_t i=0; i < 20; i++) { // infinite loop
-    digitalWrite(LED_PIN, HIGH);  // // Turn the LED on
-    vTaskDelay(*((float*)parameter) / 2 / portTICK_PERIOD_MS);
-    digitalWrite(LED_PIN, LOW);  // Turn the LED off
-    vTaskDelay(*((float*)parameter) / 2 / portTICK_PERIOD_MS);
+// RGB status checker
+void start_led_tracker(void * pvParameter) {
+
+  for(;;) { // infinite loop
+
+    bool charger_pok = fuel_gauge.read_charger_pok(true);
+    bool charger_status = fuel_gauge.read_charger_status(true);
+    light_system.read_data(true);
+    fuel_gauge.read_data(true);
+
+    // Do not update if device is not plugged in and CO2 has not been read
+    if((co2_system.co2_ppm == 0) & (~charger_pok)){
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      continue;
+    } 
+
+    // Check relevant statuses
+    rgb_system.set_status(light_system.light_vis, 
+                          charger_pok,
+                          charger_status,
+                          fuel_gauge.level_10_percent, 
+                          co2_system.co2_ppm);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
   }
 }
 
@@ -107,13 +124,12 @@ void setup() {
 
   // Charger and fuel gauge config
   fuel_gauge.configure_system();
-  fuel_gauge.charger_pok_pin = CHARGER_POK;
-  fuel_gauge.charger_status_pin = CHARGER_STATUS;
-  pinMode(CHARGER_POK, INPUT);
-  pinMode(CHARGER_EN, OUTPUT);
-  pinMode(CHARGER_STATUS, INPUT);
-  fuel_gauge.read_charger_pok(true);
-  digitalWrite(CHARGER_EN, LOW);  // Enable charging
+  fuel_gauge.charger_pok_pin = CHARGER_POK_PIN;
+  fuel_gauge.charger_status_pin = CHARGER_STATUS_PIN;
+  pinMode(CHARGER_POK_PIN, INPUT);
+  pinMode(CHARGER_EN_PIN, OUTPUT);
+  pinMode(CHARGER_STATUS_PIN, INPUT);
+  digitalWrite(CHARGER_EN_PIN, LOW);  // Enable charging
 
   // Light sensor config
   light_system.interrupt_pin = tsl_interrupt_pin;
@@ -129,8 +145,7 @@ void setup() {
   // LEDs and LED driver config
   pinMode(LED_DRIVER_EN_PIN, OUTPUT);
   digitalWrite(LED_DRIVER_EN_PIN, HIGH);  // Enable
-  rgb_system.configure_pwm_mode();
-  rgb_system.off();
+  xTaskCreate(start_led_tracker, "Set RGB",  2048, NULL, 1, NULL);
 
   // Display config
   display_ss.configure_system();
@@ -155,11 +170,6 @@ void loop() {
   // Read Other Data
   temp_sensor.read_data(true);
   bme_system.read_data(true);
-  fuel_gauge.read_data(true);
-
-  // Read Charger Status
-  bool charger_pok = fuel_gauge.read_charger_pok(true);
-  bool charger_status = fuel_gauge.read_charger_status(true);
 
   // Interrupts
   light_system.read_interrupt(true);
@@ -180,14 +190,6 @@ void loop() {
                             &fuel_gauge.level_10_mah,
                             &fuel_gauge.batt_10_voltage,
                             false);  
-  
-  // Set LED Mode
-  rgb_system.set_status(light_system.light_vis, 
-                        charger_pok,
-                        charger_status,
-                        fuel_gauge.level_10_percent, 
-                        co2_system.co2_ppm,
-                        true);
 
   // Wifi config
   wifi_system.connect_to_wifi(ssid, password);  // Only connects if it's not already connected
@@ -214,7 +216,7 @@ void loop() {
   wifi_system.disconnect();
   
   // Put Microcontroller to sleep for 10 min
-  if (!charger_pok) {
+  if (!fuel_gauge.charger_pok) {
     LOGGER::write_to_log("LOG", "SLEEP");
     Serial.println("");
     // esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);

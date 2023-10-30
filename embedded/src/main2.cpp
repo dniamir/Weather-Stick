@@ -224,6 +224,7 @@ void loop() {
     esp_sleep_enable_timer_wakeup(60 * 10 * 1e6);  // us
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_14, 0); // If charger detects an OK power source, start up system
     gpio_hold_en(GPIO_NUM_15);  // Keep charger enabled while in sleep mode
+    gpio_hold_en(GPIO_NUM_26);  // Keep LED off while in sleep mode
     gpio_hold_en(GPIO_NUM_17);  // Keep LED_DRIVER_EN_PIN high (won't work with non-RTC pin)
     esp_deep_sleep_start();
   }

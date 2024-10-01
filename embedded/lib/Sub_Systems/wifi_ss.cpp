@@ -5,6 +5,9 @@ WIFI_SS::WIFI_SS() {}
 
 WIFI_SS::WIFI_SS(const char* ssid, const char* password) {
     WIFI_SS::connect_to_wifi(ssid, password);
+
+    // Enable Wi-Fi Power Save Mode
+    WiFi.setSleep(true);  
 }
 
 void WIFI_SS::connect_to_wifi(const char* ssid, const char* password) {
@@ -31,13 +34,13 @@ void WIFI_SS::connect_to_wifi(const char* ssid, const char* password) {
     else {
         LOGGER::write_to_log("WIFI_CONNECT", "FAILED");
     }
-    
 }
 
 void WIFI_SS::disconnect() {
     WiFi.disconnect();
     delay(200);  // Delay needed otherwise Wifi.status() is not updated in time
     WIFI_SS::status = (WiFi.status() == WL_CONNECTED);
+    LOGGER::write_to_log("WIFI_DISCONNECT", "Wi-Fi disconnected");
 }
 
 void WIFI_SS::send_message(String transmission_message[], bool print_data) {

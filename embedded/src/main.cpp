@@ -14,8 +14,8 @@ const float led_blink_time = 1000;
 int I2C_SDA = 33;
 int I2C_SCL = 32;
 
-const int CHARGER_EN = 15;
-const int CHARGER_POK = 14;
+const int CHARGER_EN_PIN = 15;
+const int CHARGER_POK_PIN = 14;
 
 SCD4x_SS co2_system;
 
@@ -43,12 +43,12 @@ void setup() {
 
   co2_system.begin(Wire);
 
-  pinMode(CHARGER_EN, OUTPUT);
-  pinMode(CHARGER_POK, INPUT);
+  pinMode(CHARGER_EN_PIN, OUTPUT);
+  pinMode(CHARGER_POK_PIN, INPUT);
 
   // Set Charging to Enable
   Serial.println("Enable Charging");
-  digitalWrite(CHARGER_EN, LOW);
+  digitalWrite(CHARGER_EN_PIN, LOW);
 
 }
 
@@ -62,7 +62,7 @@ void loop() {
 
   // Check charging source
   Serial.print("Charger OK? - (0 is yes, 1 is no) - ");
-  Serial.println(digitalRead(CHARGER_POK));
+  Serial.println(digitalRead(CHARGER_POK_PIN));
 
   // CO2 Loop
   delay(6000);

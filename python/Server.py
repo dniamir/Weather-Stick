@@ -64,7 +64,10 @@ df_data = None
 while True:
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
+        try:
+            s.bind((HOST, PORT))
+        except:
+            continue
         s.listen()
         # Time out options
         
